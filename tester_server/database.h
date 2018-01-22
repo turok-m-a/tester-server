@@ -10,25 +10,28 @@
 #include <QString>
 #include <iostream>
 #include <vector>
+#include <QByteArray>
+#include <QDataStream>
 using namespace std;
 class dataBase
 {
 private:
 
     dataBase();
-    dataBase( const Singleton&);
+    dataBase( const dataBase&);
     dataBase& operator=(dataBase& );
     QSqlDatabase db;
 public:
    //dataBase();
     static dataBase& getInstance() {
-           static Singleton  instance;
+           static dataBase  instance;
            return instance;
        }
     void addSubject(QString name);
     vector<QString> getSubjects();
     int getUserId(QString name);
-    userState gSetStudentState(int id);
+    int getStudentCurrentExamState(int id,int & subject_id,int & question_select_type,QByteArray & question_list,int & exam_id);
+    QByteArray getQuestionsForExam(QByteArray question_list);
 };
 
 #endif // DATABASE_H

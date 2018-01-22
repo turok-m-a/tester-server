@@ -4,6 +4,7 @@
 #include "connectionthread.h"
 class connection
 {
+
 private:
     SOCKET s;
 public:

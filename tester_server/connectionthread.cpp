@@ -2,19 +2,35 @@
 
 void connectionThread::processStudent()
 {
-    database db = dataBase.getInstance();
-    db.getStudentStatus(userId);
+    dataBase & db = dataBase::getInstance();
+    int subject_id,status,select_type,exam_id;
+    QByteArray question_list;
+    status = db.getStudentCurrentExamState(userId,subject_id,select_type,question_list,exam_id);
+    if (status != 11){
+        int code = 2;//нет допуска
+        send(sockDescriptor,(char*)&code,4,0);
+        closesocket(sockDescriptor);
+        return;
+    }
+    if (select_type == 1) { //список вопросов заранее задан
+        question_list = db.getQuestionsForExam(question_list); //получаем сами вопросы для передачи на клиент.
+        int size = question_list.size();
+        send(sockDescriptor,question_list.constData(),size,0);
+    }
+    //to-do: рандомные вопросы по предмету
 
 }
 
 connectionThread::connectionThread(SOCKET s, QObject *parent) :
-    QThread(parent), sockDescriptor(s),person (0) {}
+    QThread(parent), sockDescriptor(s),userType (0) {}
 
 void connectionThread::run()
 {
+    cout << "thread start\n";
     if(!authorization()) {
-        send(sockDescriptor,"NOTAUTH",8,0);
-        closesocket(s);
+        int code = 1;//студента с таким № билета нет
+        send(sockDescriptor,(char*)&code,4,0);
+        closesocket(sockDescriptor);
         return;
     }
     switch (userType) {
@@ -22,7 +38,7 @@ void connectionThread::run()
         processStudent();
         break;
     case 2:
-        processTeacher();
+        //processTeacher();
         break;
     default:
         break;
@@ -31,14 +47,19 @@ void connectionThread::run()
 
 bool connectionThread::authorization()
 {
-    recv(sockDescriptor,&userType,sizeof(int),0);
+    recv(sockDescriptor,(char*)&userType,sizeof(int),0);
     char buf[40];
-    recv(sockDescriptor,&buf,sizeof(buf),0);
+    recv(sockDescriptor,buf,sizeof(buf),0);
     QString userName(buf);
-    database db = dataBase.getInstance();
-    userID = db.getUserId(userName);
-    if (userId < 0)
+    dataBase & db = dataBase::getInstance();
+    userId= db.getUserId(userName);
+    if (userId < 0){
+        cout<<"auth fail\n";
+        cout << " ";
         return false;
-    else
+    }
+    else{
+        cout<<"auth success\n";
         return true;
+    }
 }

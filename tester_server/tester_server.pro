@@ -26,3 +26,4 @@ HEADERS += \
     connection.h \
     connectionthread.h \
     states.h
+win32: LIBS += -lws2_32

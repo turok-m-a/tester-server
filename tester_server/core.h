@@ -4,9 +4,9 @@
 
 
 
-
+#include <database.h>
 #include <QString>
-
+#include <connection.h>
 using namespace std;
 class core : public QObject
 {

@@ -3,16 +3,19 @@
 #include <QThread>
 #include <winsock2.h>
 #include <database.h>
-class connectionThread : QThread
+#include <QByteArray>
+class connectionThread : public QThread
 {
-     Q_OBJECT
+private:
     SOCKET sockDescriptor;
     int userType; // 1 - student, 2 - teacher, 3 - admin
     int userId;
     void processStudent();
     void processTeacher();
 public:
-    connectionThread(SOCKET s = NULL,QObject* parent);
+     Q_OBJECT
+public:
+    connectionThread(SOCKET s,QObject* parent);
     void run();
     bool authorization();
 
