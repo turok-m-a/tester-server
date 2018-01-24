@@ -110,12 +110,22 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
     int q_textlen = query.value(2).toByteArray().size();
     //questions.append(answerlen);
     //questions.append(answer);
-    stream << q_textlen << q_text;
+    //stream << q_textlen;
+    stream << q_text;
+    int adv_data_len = 0;
     QByteArray adv_data = query.value(3).toByteArray();
-    int adv_data_len = query.value(3).toByteArray().size();
+    if (! query.value(3).isNull()) {
+    adv_data_len = query.value(3).toByteArray().size();
+    stream << adv_data;
+    } else {
+        stream << adv_data_len;
+    }
     //questions.append(adv_data_len);
     //questions.append(adv_data);
-    stream << adv_data_len << adv_data;
+//    stream << adv_data_len;
+//    if (adv_data_len != 0) {
+//        stream << adv_data;
+//    }
     }
     return byteArray;
 }
