@@ -5,6 +5,7 @@ int Question::getAnswerNumber()
     int num = 0;
     for(int i =0;i<rawQuestionText.size();i++){
         int nextAnswerPosition = rawQuestionText.indexOf('$',i);
+        if(nextAnswerPosition == -1) break;
         if(rawQuestionText[nextAnswerPosition-1] != QChar('#')){
                 num++;
 

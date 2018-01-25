@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "testwindow.h"
 #include <QPushButton>
+#include <network.h>
+#include <connectionerror.h>
 class TestWindow;
 namespace Ui {
 class MainWindow;

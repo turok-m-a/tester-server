@@ -34,8 +34,10 @@ HEADERS += \
         mainwindow.h \
     testwindow.h \
     question.h \
-    network.h
+    network.h \
+    connectionerror.h
 
 FORMS += \
         mainwindow.ui \
     testwindow.ui
+win32: LIBS += -lws2_32

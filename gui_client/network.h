@@ -3,11 +3,21 @@
 #include "question.h"
 #include "qvector.h"
 #include "qstring.h"
-class network
+#include "winsock2.h"
+#
+class Network
 {
+private:
+    Network();
+    Network( const Network&);
+    Network& operator=(Network& );
 public:
-    network();
-    QVector<Question> getQuestionsForStudent(QString studLogin);
+
+    static Network& getInstance() {
+           static Network  instance;
+           return instance;
+       }
+    QVector<Question> getQuestionsForStudent(QString studLogin,int & loginStatus);
 };
 
 #endif // NETWORK_H

@@ -1,0 +1,7 @@
+#ifndef CONNECTIONERROR_H
+#define CONNECTIONERROR_H
+
+#define CONN_OK 1
+#define CONN_NOT_FOUND 2
+#define CONN_ERROR 3
+#endif // CONNECTIONERROR_H

@@ -33,7 +33,13 @@ void MainWindow::handleButton()
 
 void MainWindow::on_loginButton_clicked()
 {
-
+    Network & network = Network::getInstance();
+    QVector<Question> questions;
+    int loginStatus;
+    questions = network.getQuestionsForStudent(ui->login->text(),loginStatus);
+    if (loginStatus == CONN_OK){
     testWindow = new TestWindow();
+    testWindow->setQuestions(questions);
     testWindow->showWindow();
+    }
 }

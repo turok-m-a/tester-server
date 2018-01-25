@@ -8,7 +8,7 @@ class Question
 {
 private:
     int id;
-    int type;
+
     QString rawQuestionText;
     QVector<QString> answers;
     int selectedAnswer = -1; //тип вопроса 1
@@ -16,6 +16,7 @@ private:
     QByteArray answer;       //тип 3,4
     QByteArray advData;
 public:
+    int type;
     int getAnswerNumber();
     QString getQuestionText();
     QString getAnswerText(int i);
