@@ -4,6 +4,12 @@
 #include <QDialog>
 #include <question.h>
 #include <QCheckBox>
+#include <qlineedit.h>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsTextItem>
+#include <QGraphicsItem>
+#include <moveitem.h>
 namespace  Ui {
     class TestWindow;
 }
@@ -23,11 +29,14 @@ private slots:
     void on_submitButton_clicked();
 
 private:
-    Ui::TestWindow * tui;
+    Ui::TestWindow * ui;
     QVector<Question> questions;
     int currentQuestion;
     void showQuestion(int number);
+    void hideQuestion();
+    void showSequenceQuestion();
     QVector<QObject *> guiObjects;
+    QGraphicsScene * scene;
 };
 
 #endif // TESTWINDOW_H

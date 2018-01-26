@@ -4,6 +4,10 @@
 #include <QString>
 #include <QChar>
 #include <QVector>
+#define SELECT_QUESTION_TYPE 1  //выбор одного или нескольких вариантов
+#define INPUT_QUESTION_TYPE 2   //ввод ответа с клавиатуры
+#define SEQUENCE_QUESTION_TYPE 3//выбор последовательности действий
+#define MATCH_QUESTION_TYPE 4   //сопоставление
 class Question
 {
 private:
@@ -11,7 +15,7 @@ private:
 
     QString rawQuestionText;
     QVector<QString> answers;
-    int selectedAnswer = -1; //тип вопроса 1
+    QVector<int> selectedAnswers; //тип вопроса 1
     QString answerText;      //тип 2
     QByteArray answer;       //тип 3,4
     QByteArray advData;
@@ -23,6 +27,8 @@ public:
     Question(QString rawText,int _id,int _type);
     Question();
     void setAdvData(QByteArray data);
+    void addAnswer(int selectedAnswer);
+    void addAnswer(QString answerInput);
 };
 
 #endif // QUESTION_H

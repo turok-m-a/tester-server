@@ -28,14 +28,18 @@ SOURCES += \
         mainwindow.cpp \
     testwindow.cpp \
     question.cpp \
-    network.cpp
+    network.cpp \
+    moveitem.cpp \
+    sequencequestiondrawer.cpp
 
 HEADERS += \
         mainwindow.h \
     testwindow.h \
     question.h \
     network.h \
-    connectionerror.h
+    connectionerror.h \
+    moveitem.h \
+    sequencequestiondrawer.h
 
 FORMS += \
         mainwindow.ui \

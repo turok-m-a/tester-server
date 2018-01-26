@@ -27,6 +27,7 @@ QString Question::getQuestionText()
     }
     for(int i =0;i<text.size();i++){
         int nextAnswerPosition = text.indexOf('$',i);
+        if (nextAnswerPosition == -1) break;
         if(text[nextAnswerPosition-1] != QChar('#')){
             text.truncate(nextAnswerPosition);
             break;
@@ -45,22 +46,33 @@ Question::Question(QString rawText, int _id, int _type) : id(_id), type(_type)
     rawQuestionText = rawText;
     int answerSignPosition;
     QVector<int> answerSignPositions;
-    for(int i =0;i<rawQuestionText.size();i++){
-        answerSignPosition = rawQuestionText.indexOf('$',i);
-        if (answerSignPosition == -1) break;
-        if(rawQuestionText[answerSignPosition-1] != QChar('#')){
-            answerSignPositions.push_back(answerSignPosition);
+    if(type == SELECT_QUESTION_TYPE){
+        for(int i =0;i<rawQuestionText.size();i++){
+            answerSignPosition = rawQuestionText.indexOf('$',i);
+            if (answerSignPosition == -1) break;
+            if(rawQuestionText[answerSignPosition-1] != QChar('#')){
+                answerSignPositions.push_back(answerSignPosition);
+            }
+            i = answerSignPosition+1;
         }
-        i = answerSignPosition+1;
+        for(int i =0;i<answerSignPositions.size()-1;i++){
+            answers.push_back(rawQuestionText.mid(answerSignPositions[i],answerSignPositions[i+1]-answerSignPositions[i]));
+        }
+        answers.push_back(rawQuestionText.mid(answerSignPositions.last()));
     }
-    for(int i =0;i<answerSignPositions.size()-1;i++){
-        answers.push_back(rawQuestionText.mid(answerSignPositions[i],answerSignPositions[i+1]-answerSignPositions[i]));
-    }
-    answers.push_back(rawQuestionText.mid(answerSignPositions.last()));
-    selectedAnswer = -1;
 }
 
 Question::Question()
 {
 
+}
+
+void Question::addAnswer(int selectedAnswer)
+{
+    selectedAnswers.push_back(selectedAnswer);
+}
+
+void Question::addAnswer(QString answerInput)
+{
+    answerText = answerInput;
 }
