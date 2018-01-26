@@ -48,14 +48,17 @@ void TestWindow::showQuestion(int number)
         for (int i=0;i<answerNumber;i++){
             QCheckBox * checkBox = new QCheckBox(questions[number].getAnswerText(i), this);
             guiObjects.push_back(checkBox);
-            checkBox->setGeometry(50,100+i*50,500,15);
+            checkBox->setGeometry(600,100+i*50,500,25);
+            QFont f;
+            f.setPixelSize(14);
+            checkBox->setFont(f);
             checkBox->show();
         }
     }
     if (type == INPUT_QUESTION_TYPE){
         QLineEdit * edit = new QLineEdit(this);
         guiObjects.push_back(edit);
-        edit->setGeometry(50,100,500,15);
+        edit->setGeometry(600,100,400,15);
         edit->show();
     }
 }
@@ -89,22 +92,17 @@ void TestWindow::showSequenceQuestion()
     scene = new QGraphicsScene(this);   // Инициализируем графическую сцену
     scene->setItemIndexMethod(QGraphicsScene::NoIndex); // настраиваем индексацию элементов
     QGraphicsView * graphicsView = new QGraphicsView(this);
-    //graphicsView->resize(600,400);  // Устанавливаем размер graphicsView
-    graphicsView->setGeometry(10,50,640,340);
+    graphicsView->resize(500,600);  // Устанавливаем размер graphicsView
+    graphicsView->setGeometry(500,10,500,600);
     graphicsView->setScene(scene);  // Устанавливаем графическую сцену в graphicsView
     graphicsView->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
     graphicsView->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
     graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     graphicsView->show();
-    scene->setSceneRect(0,0,600,300); // Устанавливаем размер сцены
+    scene->setSceneRect(0,0,450,550); // Устанавливаем размер сцены
 
-    //
-    MoveItem *item = new MoveItem();        // Создаём графический элемента
-    item->setPos(0,    // Устанавливаем случайную позицию элемента
-                 0);
-    //QGraphicsTextItem *textItem = new QGraphicsTextItem("testtesttest",item);
-    //textItem->setFlags(QGraphicsItem::ItemIsMovable);
-    //textItem->setTextWidth(60);
-    scene->addItem(item);   // Добавляем элемент на графическую сцену
-    scene->addItem(new MoveItem());
+
+
+    SequenceQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene);
+
 }

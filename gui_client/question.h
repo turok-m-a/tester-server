@@ -29,6 +29,8 @@ public:
     void setAdvData(QByteArray data);
     void addAnswer(int selectedAnswer);
     void addAnswer(QString answerInput);
+    void addAdvancedData(QByteArray data);
+    QByteArray getAdvancedData();
 };
 
 #endif // QUESTION_H

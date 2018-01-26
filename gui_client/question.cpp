@@ -62,6 +62,8 @@ Question::Question(QString rawText, int _id, int _type) : id(_id), type(_type)
     }
 }
 
+
+
 Question::Question()
 {
 
@@ -75,4 +77,14 @@ void Question::addAnswer(int selectedAnswer)
 void Question::addAnswer(QString answerInput)
 {
     answerText = answerInput;
+}
+
+void Question::addAdvancedData(QByteArray data)
+{
+    advData = data;
+}
+
+QByteArray Question::getAdvancedData()
+{
+    return advData;
 }

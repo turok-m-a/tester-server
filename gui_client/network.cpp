@@ -60,7 +60,11 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
         int adv_len = *((int*)questions);
         questions+=4;
         // adv data
+        if (adv_len >0){
+        QByteArray data(questions,adv_len);
+        questionsContainer.last().addAdvancedData(data);
         questions+=adv_len;
+        }
     }
     QString del = questionsContainer[0].getQuestionText();//debug
     return questionsContainer;

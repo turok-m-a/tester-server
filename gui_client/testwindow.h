@@ -7,9 +7,9 @@
 #include <qlineedit.h>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-#include <QGraphicsTextItem>
-#include <QGraphicsItem>
-#include <moveitem.h>
+
+
+#include <sequencequestiondrawer.h>
 namespace  Ui {
     class TestWindow;
 }

@@ -23,7 +23,9 @@ private:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
+    QString text;
+    int lines;
+    void setText(QString _text);
 public slots:
 };
 
