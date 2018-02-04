@@ -37,6 +37,7 @@ private:
     void showSequenceQuestion();
     QVector<QObject *> guiObjects;
     QGraphicsScene * scene;
+    SequenceQuestionDrawer * drawer;
 };
 
 #endif // TESTWINDOW_H

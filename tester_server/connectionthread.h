@@ -10,8 +10,10 @@ private:
     SOCKET sockDescriptor;
     int userType; // 1 - student, 2 - teacher, 3 - admin
     int userId;
+    int opCode;
     void processStudent();
     void processTeacher();
+    void processStudentAnswers();
 public:
      Q_OBJECT
 public:

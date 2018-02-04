@@ -17,19 +17,25 @@ private:
     QVector<QString> answers;
     QVector<int> selectedAnswers; //тип вопроса 1
     QString answerText;      //тип 2
-    QByteArray answer;       //тип 3,4
+    QVector<int> answer;       //тип 3,4
     QByteArray advData;
 public:
     int type;
+    bool isAnswered;
     int getAnswerNumber();
     QString getQuestionText();
     QString getAnswerText(int i);
+    QString getAnswerText();
     Question(QString rawText,int _id,int _type);
     Question();
+     QVector<int> getSelectedAnswers();
+      QVector<int> getAnswersSequence();
     void setAdvData(QByteArray data);
     void addAnswer(int selectedAnswer);
     void addAnswer(QString answerInput);
+    void addAnswer(QVector<int> a);
     void addAdvancedData(QByteArray data);
+    void resetAnswer();
     QByteArray getAdvancedData();
 };
 

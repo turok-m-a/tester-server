@@ -4,14 +4,20 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <moveitem.h>
+#include <QMap>
+#ifdef QT_DEBUG
+#include <iostream>
+#endif
 class SequenceQuestionDrawer
 {
 private:
     QByteArray question;
-    QVector<QGraphicsItem *> guiObjects;
+    QVector<MoveItem *> guiObjects;
+    QMap<int,MoveItem *> guiObjectsMap;
 public:
     SequenceQuestionDrawer(QByteArray questionData, QGraphicsScene *scene);
-
+    QVector<int> getSequence();
+    ~SequenceQuestionDrawer();
 };
 
 #endif // SEQUENCEQUESTIONDRAWER_H

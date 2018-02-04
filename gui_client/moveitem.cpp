@@ -3,7 +3,7 @@
 MoveItem::MoveItem(QObject *parent) :
      QObject(parent),QGraphicsItem()
 {
-    setText("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n\n222");
+    //setText("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq\n\n222");
 }
 
 MoveItem::~MoveItem()
@@ -32,13 +32,8 @@ void MoveItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 
 void MoveItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    /* Устанавливаем позицию графического элемента
-     * в графической сцене, транслировав координаты
-     * курсора внутри графического элемента
-     * в координатную систему графической сцены
-     * */
     QPointF p(event->pos());
-    p.rx() = (qreal)(((int)p.rx()/15)*15);
+    p.rx() = 0;//(qreal)(((int)p.rx()/15)*15);
     p.ry() = (qreal)(((int)p.ry()/15)*15);
     this->setPos(mapToScene(p));
 }
@@ -61,7 +56,17 @@ void MoveItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     Q_UNUSED(event);
 }
 
-void MoveItem::setText(QString _text)
+void MoveItem::setQuestionNumber(int n)
+{
+    questionNumber = n;
+}
+
+int MoveItem::getQuestionNumber()
+{
+    return questionNumber;
+}
+
+qreal MoveItem::setText(QString _text)
 {
    lines = 0;
    int symbolCounter = 29;
@@ -77,4 +82,11 @@ void MoveItem::setText(QString _text)
    if(_text.size()<29 && lines == 0){
        lines = 1;
    }
+   return positionY + lines*15 + 15;
 }
+
+void MoveItem::setPositionY(qreal pos)
+{
+    positionY = pos;
+}
+

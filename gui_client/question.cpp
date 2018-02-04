@@ -41,8 +41,14 @@ QString Question::getAnswerText(int i)
     return answers[i];
 }
 
+QString Question::getAnswerText()
+{
+    return answerText;
+}
+
 Question::Question(QString rawText, int _id, int _type) : id(_id), type(_type)
 {
+    isAnswered = false;
     rawQuestionText = rawText;
     int answerSignPosition;
     QVector<int> answerSignPositions;
@@ -69,19 +75,45 @@ Question::Question()
 
 }
 
+QVector<int> Question::getSelectedAnswers()
+{
+    return selectedAnswers;
+}
+
+QVector<int> Question::getAnswersSequence()
+{
+    return answers;
+}
+
 void Question::addAnswer(int selectedAnswer)
 {
+    isAnswered = true;
     selectedAnswers.push_back(selectedAnswer);
 }
 
 void Question::addAnswer(QString answerInput)
 {
+    isAnswered = true;
     answerText = answerInput;
+}
+
+void Question::addAnswer(QVector<int> a)
+{
+    isAnswered = true;
+    answer = a;
 }
 
 void Question::addAdvancedData(QByteArray data)
 {
     advData = data;
+}
+
+void Question::resetAnswer()
+{
+    selectedAnswers.clear();
+    answerText.clear();
+    answer.clear();
+    isAnswered = false;
 }
 
 QByteArray Question::getAdvancedData()

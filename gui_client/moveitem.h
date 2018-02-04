@@ -14,7 +14,10 @@ class MoveItem : public QObject,public QGraphicsItem
 public:
     explicit MoveItem(QObject *parent = 0);
     ~MoveItem();
-
+    qreal setText(QString _text);
+    void setPositionY(qreal pos);
+    void setQuestionNumber(int n);
+    int getQuestionNumber();
 signals:
 
 private:
@@ -23,9 +26,11 @@ private:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    int questionNumber;
     QString text;
     int lines;
-    void setText(QString _text);
+    qreal positionY;
+
 public slots:
 };
 
