@@ -12,7 +12,8 @@ private:
     Network( const Network&);
     Network& operator=(Network& );
 public:
-
+    int currentUserType;
+    QString studLogin;
     static Network& getInstance() {
            static Network  instance;
            return instance;

@@ -15,7 +15,7 @@ private:
     QVector<MoveItem *> guiObjects;
     QMap<int,MoveItem *> guiObjectsMap;
 public:
-    SequenceQuestionDrawer(QByteArray questionData, QGraphicsScene *scene);
+    SequenceQuestionDrawer(QByteArray questionData, QGraphicsScene *scene,QVector<int> restoreSequence = QVector<int>());
     QVector<int> getSequence();
     ~SequenceQuestionDrawer();
 };

@@ -7,7 +7,7 @@
 #include <qlineedit.h>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-
+#include <network.h>
 
 #include <sequencequestiondrawer.h>
 namespace  Ui {
@@ -34,7 +34,7 @@ private:
     int currentQuestion;
     void showQuestion(int number);
     void hideQuestion();
-    void showSequenceQuestion();
+    void showSequenceQuestion(QVector<int> restoreSequence = QVector<int>());
     QVector<QObject *> guiObjects;
     QGraphicsScene * scene;
     SequenceQuestionDrawer * drawer;

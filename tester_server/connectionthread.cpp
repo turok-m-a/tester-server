@@ -3,9 +3,8 @@
 void connectionThread::processStudent()
 {
     dataBase & db = dataBase::getInstance();
-    int subject_id,status,select_type,exam_id;
-    QByteArray question_list;
-    status = db.getStudentCurrentExamState(userId,subject_id,select_type,question_list,exam_id);   
+    int subject_id,status,select_type;
+    status = db.getStudentCurrentExamState(userId,subject_id,select_type,question_list,exam_id);
     if (status != 11){
         int code = 2;//нет допуска
         send(sockDescriptor,(char*)&code,4,0);
@@ -14,6 +13,7 @@ void connectionThread::processStudent()
     }
     if (opCode == 2){
         processStudentAnswers();
+        return;
     }
     if (select_type == 1) { //список вопросов заранее задан
         question_list = db.getQuestionsForExam(question_list); //получаем сами вопросы для передачи на клиент.
@@ -27,7 +27,50 @@ void connectionThread::processStudent()
 
 void connectionThread::processStudentAnswers()
 {
+    dataBase & db = dataBase::getInstance();
+    int type,id,questionNumber; //тип и id вопроса
+    recv(sockDescriptor,(char*)&questionNumber,sizeof(int),0);
+    int testMark = 0; //набранное кол-во баллов
+    for (int i=0;i<questionNumber;i++){
+    recv(sockDescriptor,(char*)&type,sizeof(int),0);
+    recv(sockDescriptor,(char*)&id,sizeof(int),0);
 
+    if (type == 1){
+        int number;
+        QVector<int> answers;
+        recv(sockDescriptor,(char*)&number,4,0);
+        number/=sizeof(int);
+        int answer;
+        for(int j=0;j<number;j++){
+            recv(sockDescriptor,(char*)&answer,4,0);
+            answers.push_back(answer);
+        }
+        testMark += db.checkAnswer(id,answers);
+    }
+    if (type == 2){
+        int textLen;
+        recv(sockDescriptor,(char*)&textLen,4,0);
+        char * utf8string = new char[textLen+1];
+        recv(sockDescriptor,utf8string,textLen,0);
+        QString answer = QString::fromUtf8(utf8string,textLen);
+        testMark += db.checkAnswer(id,answer);
+    }
+    if (type == 3){
+        int number;
+        QVector<int> answers;
+        recv(sockDescriptor,(char*)&number,4,0);
+        number/=sizeof(int);
+        int answer;
+        for(int j=0;j<number;j++){
+            recv(sockDescriptor,(char*)&answer,4,0);
+            answers.push_back(answer);
+        }
+        testMark += db.checkAnswer(id,answers);
+    }
+    }
+    std::cout <<"testmark " <<testMark ;
+    send(sockDescriptor,(char*)&testMark,sizeof(int),0);
+    closesocket(sockDescriptor);
 }
 
 connectionThread::connectionThread(SOCKET s, QObject *parent) :

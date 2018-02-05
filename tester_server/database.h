@@ -8,8 +8,9 @@
 #include <QObject>
 #include <QSqlError>
 #include <QString>
+#include <QVector>
+#include <QSet>
 #include <iostream>
-#include <vector>
 #include <QByteArray>
 #include <QDataStream>
 using namespace std;
@@ -28,8 +29,10 @@ public:
            return instance;
        }
     void addSubject(QString name);
-    vector<QString> getSubjects();
+    QVector<QString> getSubjects();
     int getUserId(QString name);
+    int checkAnswer(int id,QVector<int> answers);
+    int checkAnswer(int id,QString answer);
     int getStudentCurrentExamState(int id,int & subject_id,int & question_select_type,QByteArray & question_list,int & exam_id);
     QByteArray getQuestionsForExam(QByteArray question_list);
 };

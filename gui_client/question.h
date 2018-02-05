@@ -14,7 +14,7 @@ private:
     int id;
 
     QString rawQuestionText;
-    QVector<QString> answers;
+    QVector<QString> answers;   //варианты ответов
     QVector<int> selectedAnswers; //тип вопроса 1
     QString answerText;      //тип 2
     QVector<int> answer;       //тип 3,4
@@ -36,6 +36,7 @@ public:
     void addAnswer(QVector<int> a);
     void addAdvancedData(QByteArray data);
     void resetAnswer();
+    int getId();
     QByteArray getAdvancedData();
 };
 

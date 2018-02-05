@@ -1,8 +1,9 @@
 #include "sequencequestiondrawer.h"
 
-SequenceQuestionDrawer::SequenceQuestionDrawer(QByteArray questionData, QGraphicsScene * scene)
+SequenceQuestionDrawer::SequenceQuestionDrawer(QByteArray questionData, QGraphicsScene * scene, QVector<int> restoreSequence)
 {
     QByteArray temp;
+    QVector<QString> answers;
     qreal nextPosition = 0;
     int questionNumber = 0;
     for(int i=0;i<questionData.size();i++){
@@ -11,18 +12,35 @@ SequenceQuestionDrawer::SequenceQuestionDrawer(QByteArray questionData, QGraphic
         } else {
             temp.push_back(questionData[i]);
             temp.push_back(questionData[i+1]);
+            answers.push_back(QString::fromUtf8(temp));
+            temp.clear();
             i+=2;
-            MoveItem * item = new MoveItem();
-            item->setPositionY(nextPosition);
-            nextPosition = item->setText(QString::fromUtf8(temp));
-            item->setPos(0,nextPosition);
-            item->setQuestionNumber(questionNumber);
-            questionNumber++;
-            scene->addItem(item);
-            guiObjects.push_back(item);
+
             temp.clear();
         }
 
+    }
+    if (restoreSequence.isEmpty()){
+    foreach (QString str, answers) {
+        MoveItem * item = new MoveItem();
+        item->setPositionY(nextPosition);
+        nextPosition = item->setText(str);
+        item->setPos(0,nextPosition);
+        item->setQuestionNumber(questionNumber);
+        questionNumber++;
+        scene->addItem(item);
+        guiObjects.push_back(item);
+    }
+    } else {    //восстанавливаем в требуемом порядке
+        for (int i=0;i<answers.size();i++){
+        MoveItem * item = new MoveItem();
+        item->setPositionY(nextPosition);
+        nextPosition = item->setText(answers[restoreSequence[i]]);
+        item->setPos(0,nextPosition);
+        item->setQuestionNumber(restoreSequence[i]);
+        scene->addItem(item);
+        guiObjects.push_back(item);
+        }
     }
     question = questionData;
 }

@@ -37,7 +37,11 @@ void TestWindow::on_prevButton_clicked()
 
 void TestWindow::on_submitButton_clicked()
 {
-    showSequenceQuestion();//test
+    hideQuestion();
+    Network & network = Network::getInstance();
+    int mark = network.sendQuestions(questions);
+    ui->label->setText(QString::number(mark));
+   // this->hide();
 }
 
 void TestWindow::showQuestion(int number)
@@ -75,11 +79,11 @@ void TestWindow::showQuestion(int number)
         edit->setGeometry(600,100,400,15);
         edit->show();
         if( ! questions[currentQuestion].getAnswerText().isEmpty()){  //отобразить ранее введенный ответ
-            qobject_cast<QCheckBox *>(guiObjects.first())->setText(questions[currentQuestion].getAnswerText());
+            qobject_cast<QLineEdit *>(guiObjects.first())->setText(questions[currentQuestion].getAnswerText());
         }
     }
     if (type == SEQUENCE_QUESTION_TYPE){
-        showSequenceQuestion();
+        showSequenceQuestion(questions[currentQuestion].getAnswersSequence());
     }
 }
 
@@ -113,7 +117,7 @@ void TestWindow::hideQuestion() //сохранение ответов и скр�
     guiObjects.clear();
 }
 
-void TestWindow::showSequenceQuestion()
+void TestWindow::showSequenceQuestion(QVector<int> restoreSequence)
 {
     scene = new QGraphicsScene(this);   // Инициализируем графическую сцену
     scene->setItemIndexMethod(QGraphicsScene::NoIndex); // настраиваем индексацию элементов
@@ -127,7 +131,7 @@ void TestWindow::showSequenceQuestion()
     graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     graphicsView->show();
     scene->setSceneRect(0,0,450,550); // Устанавливаем размер сцены
-    drawer = new SequenceQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene);
+    drawer = new SequenceQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene,restoreSequence);
     //guiObjects.push_back(reinterpret_cast<QObject*>(drawer));
 
 }

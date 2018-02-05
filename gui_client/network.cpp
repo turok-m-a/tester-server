@@ -95,7 +95,7 @@ int Network::sendQuestions(QVector<Question> questions)
                 #ifdef WIN32
                 WSACleanup();
                 #endif
-                return questionsContainer;
+                return -1;
             }
 
     int userType = 1;
@@ -106,10 +106,14 @@ int Network::sendQuestions(QVector<Question> questions)
     send(s,(char*)&userType,4,0);
     send(s,(char*)&opCode,4,0);
     send(s,userName,40,0);
+    int questionNum = questions.size();
+    send(s,(char*)&questionNum,4,0);
     Question question;
     foreach (question, questions) {
         int type = question.type;
         send(s,(char*)&type,4,0);
+        int id = question.getId();
+        send(s,(char*)&id,4,0);
         if (type == 1){
             int number = question.getSelectedAnswers().size();
             number*=sizeof(int);
@@ -127,7 +131,7 @@ int Network::sendQuestions(QVector<Question> questions)
         if (type == 3){
             int number = question.getAnswersSequence().size();
             number*=sizeof(int);
-            send(s,(char*)&textLen,4,0);
+            send(s,(char*)&number,4,0);
             int answer;
             foreach (answer, question.getAnswersSequence()) {
                 send(s,(char*)&answer,4,0);
@@ -135,5 +139,8 @@ int Network::sendQuestions(QVector<Question> questions)
         }
 
     }
+    int mark;
+    recv(s,(char*)&mark,4,0);
     closesocket(s);
+    return mark;
 }

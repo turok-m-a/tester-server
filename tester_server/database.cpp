@@ -2,9 +2,6 @@
 
 dataBase::dataBase()
 {
-    //if (instance) return;
-    //instance = true;
-    ///////
     db = QSqlDatabase::addDatabase("QMYSQL", "mydb");
     db.setHostName("localhost");
     db.setDatabaseName("tester");
@@ -37,11 +34,11 @@ void dataBase::addSubject(QString name)
      query.exec();
 }
 
-vector<QString> dataBase::getSubjects()
+QVector<QString> dataBase::getSubjects()
 {
     QSqlQuery query(db);
     query.exec("SELECT name FROM subjects");
-    vector<QString> ret;
+    QVector<QString> ret;
     while (query.next()) {
          ret.push_back( QString::fromUtf8(query.value(0).toByteArray()) );
        }
@@ -61,12 +58,60 @@ int dataBase::getUserId(QString name)
      return -1;
 }
 
+int dataBase::checkAnswer(int id,QVector<int> answers)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT q_id,q_answer,difficulty,q_type FROM tester.questions WHERE q_id = ?");
+    query.addBindValue(id);
+    query.exec();
+    query.next();
+    int type = query.value(3).toInt();
+    if (type == 1){
+        QString _correctAnswers = query.value(1).toString();
+        QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
+        QSet<int> tmp;
+
+        foreach(QString num, correctAnswers){
+            tmp.insert( num.toInt());
+        }
+        if (tmp == answers.toList().toSet()){//последовательность ответов не важна
+            return query.value(2).toInt();
+        }
+    }
+    if (type == 3){
+        QString _correctAnswers = query.value(1).toString();
+        QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
+        QVector<int> tmp;
+        foreach(QString num, correctAnswers){
+            tmp.push_back(num.toInt());
+        }
+        if (tmp == answers){
+            return query.value(2).toInt();
+        }
+    }
+    return 0;
+}
+
+int dataBase::checkAnswer(int id, QString answer)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT q_id,q_answer,difficulty FROM tester.questions WHERE q_id = ?");
+    query.addBindValue(id);
+    query.exec();
+    query.next();
+    QString correctAnswer = query.value(1).toString();
+    if (!QString::compare(answer,correctAnswer,Qt::CaseInsensitive)){
+        return query.value(2).toInt();
+    }
+    return 0;
+}
+
 int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_select_type, QByteArray &question_list, int &exam_id)
 {
     QSqlQuery query(db);
     query.prepare("SELECT stud_id,exam_id,pass_status FROM tester.exam_pass_status WHERE stud_id = ?");
-    //ищем строку с статусом экзамена, к которому в данный момент получен допуск (такой должен быть 1)
-    //препод добавляет
+    //ищем строку с статусом экзамена, к которому в данный момент получен допуск (такой должен быть 1 т.к.
+    //препод добавляет студента когда тот приходит на экзамен)
     query.addBindValue(id);
     query.exec();
     int pass_status;
@@ -102,15 +147,9 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
     query.addBindValue(currentQuestion);
     query.exec();
     query.next();
-    //questions.append((char*)&q_number,4);
     stream << query.value(0).toInt() << query.value(1).toInt();
-    //questions.append((char*)&(query.value(0).toInt()),4);//q_id
-    //questions.append((char*)&(query.value(1).toInt(),4);//q_type
     QByteArray q_text = query.value(2).toByteArray();
     int q_textlen = query.value(2).toByteArray().size();
-    //questions.append(answerlen);
-    //questions.append(answer);
-    //stream << q_textlen;
     stream << q_text;
     int adv_data_len = 0;
     QByteArray adv_data = query.value(3).toByteArray();
@@ -120,12 +159,6 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
     } else {
         stream << adv_data_len;
     }
-    //questions.append(adv_data_len);
-    //questions.append(adv_data);
-//    stream << adv_data_len;
-//    if (adv_data_len != 0) {
-//        stream << adv_data;
-//    }
     }
     return byteArray;
 }

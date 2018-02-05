@@ -32,7 +32,7 @@ connection::connection()
            while (true) {  //далее данный поток лишь принимает соединения
                SOCKET client = accept(s,NULL,NULL); //to do: print client addr to console
                connectionThread * thread = new connectionThread(client,NULL);
-               QObject::connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater())); //для удаления по завершению потока
+               QObject::connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater())); //для удаления объекта по завершению потока
                thread->start();
           }
 }

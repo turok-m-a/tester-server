@@ -82,7 +82,7 @@ QVector<int> Question::getSelectedAnswers()
 
 QVector<int> Question::getAnswersSequence()
 {
-    return answers;
+    return answer;
 }
 
 void Question::addAnswer(int selectedAnswer)
@@ -114,6 +114,11 @@ void Question::resetAnswer()
     answerText.clear();
     answer.clear();
     isAnswered = false;
+}
+
+int Question::getId()
+{
+    return id;
 }
 
 QByteArray Question::getAdvancedData()
