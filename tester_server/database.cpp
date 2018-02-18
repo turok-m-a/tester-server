@@ -132,6 +132,16 @@ int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_
     return -1;//нет студента в exam_pass_status, препод не добавил допущенного студента
 }
 
+int dataBase::getMaxMark(int id)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT difficulty FROM tester.questions WHERE q_id = ?");
+    query.addBindValue(id);
+    query.exec();
+    query.next();
+    return query.value(0).toInt();
+}
+
 QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
 {
     QSqlQuery query(db);

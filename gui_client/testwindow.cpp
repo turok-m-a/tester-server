@@ -39,7 +39,7 @@ void TestWindow::on_submitButton_clicked()
 {
     hideQuestion();
     Network & network = Network::getInstance();
-    int mark = network.sendQuestions(questions);
+    float mark = network.sendQuestions(questions);
     infowindow * infoWindow = new infowindow(0,QString("\nВаша оценка: ") +  QString::number(mark));
     infoWindow->show();
     //ui->label->setText(QString("\nВаша оценка: ") +  QString::number(mark));
@@ -52,9 +52,9 @@ void TestWindow::showQuestion(int number)
     if ( ! questions[currentQuestion].getAdvancedData().isEmpty()){ //показать изображение если есть
         QPixmap outPixmap = QPixmap();
             outPixmap.loadFromData( questions[currentQuestion].getAdvancedData() );
-            ui->imageLabel->setPixmap(outPixmap);
-            ui->imageLabel->setScaledContents( true );
-            ui->imageLabel->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+            int h = ui->imageLabel->height();
+            int w = ui->imageLabel->width();
+            ui->imageLabel->setPixmap(outPixmap.scaled(w,h,Qt::KeepAspectRatio,Qt::SmoothTransformation));
             ui->imageLabel->show();
     }
     int type = questions[number].type;
@@ -80,7 +80,7 @@ void TestWindow::showQuestion(int number)
     if (type == INPUT_QUESTION_TYPE){
         QLineEdit * edit = new QLineEdit(this);
         guiObjects.push_back(edit);
-        edit->setGeometry(600,100,400,15);
+        edit->setGeometry(600,10,400,20);
         edit->show();
         if( ! questions[currentQuestion].getAnswerText().isEmpty()){  //отобразить ранее введенный ответ
             qobject_cast<QLineEdit *>(guiObjects.first())->setText(questions[currentQuestion].getAnswerText());
@@ -96,7 +96,7 @@ void TestWindow::showQuestion(int number)
             answer.remove(0,2);
             QLabel * label = new QLabel(answer, this);
             guiObjects.push_back(label);
-            label->setGeometry(i*(WINDOW_WIDTH/answerNumber),10,500,25);
+            label->setGeometry(i*(WINDOW_WIDTH/answerNumber)+20,30,500,25);
             QFont f;
             f.setPixelSize(14);
             label->setFont(f);
@@ -168,13 +168,13 @@ void TestWindow::showMatchQuestion(QVector<int> restoreSequence)
     QGraphicsView * graphicsView = new QGraphicsView(this);
     guiObjects.push_back(graphicsView);
     graphicsView->resize(400,600);  // Устанавливаем размер graphicsView
-    graphicsView->setGeometry(0,60,1000,470);
+    graphicsView->setGeometry(0,60,1010,470);
     graphicsView->setScene(scene);  // Устанавливаем графическую сцену в graphicsView
     graphicsView->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
     graphicsView->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
     graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
     graphicsView->show();
-    scene->setSceneRect(0,0,950,440); // Устанавливаем размер сцены
+    scene->setSceneRect(0,0,1000,460); // Устанавливаем размер сцены
     gDrawer = new GroupQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene,restoreSequence);
     //guiObjects.push_back(reinterpret_cast<QObject*>(drawer));
 }

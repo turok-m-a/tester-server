@@ -4,5 +4,5 @@
 #define CONN_OK 1
 #define CONN_NOT_FOUND 2
 #define CONN_ERROR 3
-#define WINDOW_WIDTH 950
+#define WINDOW_WIDTH 1000
 #endif // CONNECTIONERROR_H

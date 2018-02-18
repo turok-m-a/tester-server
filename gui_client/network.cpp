@@ -78,7 +78,7 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
     return questionsContainer;
 }
 
-int Network::sendQuestions(QVector<Question> questions)
+float Network::sendQuestions(QVector<Question> questions)
 {
     QVector<Question> questionsContainer;
     SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -141,8 +141,8 @@ int Network::sendQuestions(QVector<Question> questions)
         }
 
     }
-    int mark;
-    recv(s,(char*)&mark,4,0);
+    float mark;
+    recv(s,(char*)&mark,sizeof(float),0);
     closesocket(s);
     return mark;
 }

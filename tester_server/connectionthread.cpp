@@ -31,10 +31,11 @@ void connectionThread::processStudentAnswers()
     int type,id,questionNumber; //тип и id вопроса
     recv(sockDescriptor,(char*)&questionNumber,sizeof(int),0);
     int testMark = 0; //набранное кол-во баллов
+    int maxMark = 0; //максимальное
     for (int i=0;i<questionNumber;i++){
     recv(sockDescriptor,(char*)&type,sizeof(int),0);
     recv(sockDescriptor,(char*)&id,sizeof(int),0);
-
+    maxMark += db.getMaxMark(id);
     if (type == 1){
         int number;
         QVector<int> answers;
@@ -68,8 +69,10 @@ void connectionThread::processStudentAnswers()
         testMark += db.checkAnswer(id,answers);
     }
     }
+    float decimalMark = round ((float)testMark / (float)maxMark * 100);
+    decimalMark /= 10;
     std::cout <<"testmark " <<testMark ;
-    send(sockDescriptor,(char*)&testMark,sizeof(int),0);
+    send(sockDescriptor,(char*)&decimalMark,sizeof(float),0);
     closesocket(sockDescriptor);
 }
 

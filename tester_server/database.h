@@ -34,6 +34,7 @@ public:
     int checkAnswer(int id,QVector<int> answers);
     int checkAnswer(int id,QString answer);
     int getStudentCurrentExamState(int id,int & subject_id,int & question_select_type,QByteArray & question_list,int & exam_id);
+    int getMaxMark(int id);
     QByteArray getQuestionsForExam(QByteArray question_list);
 };
 

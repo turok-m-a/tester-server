@@ -28,6 +28,7 @@ private:
 private slots:
     void handleButton();
     void on_loginButton_clicked();
+    void on_studentSwitch_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

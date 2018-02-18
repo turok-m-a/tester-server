@@ -69,9 +69,9 @@
    <widget class="QLineEdit" name="login">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>10</x>
       <y>20</y>
-      <width>113</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -79,14 +79,46 @@
    <widget class="QLineEdit" name="password">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>10</x>
       <y>60</y>
-      <width>113</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
+    <property name="statusTip">
+     <string/>
+    </property>
     <property name="echoMode">
      <enum>QLineEdit::Password</enum>
+    </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Логин/№ ст. билета:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Пароль:</string>
     </property>
    </widget>
   </widget>

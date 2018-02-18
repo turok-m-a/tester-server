@@ -11,10 +11,10 @@ SequenceQuestionDrawer::SequenceQuestionDrawer(QByteArray questionData, QGraphic
         temp.push_back(questionData[i]);
         } else {
             temp.push_back(questionData[i]);
-            temp.push_back(questionData[i+1]);
+            //temp.push_back(questionData[i+1]);
             answers.push_back(QString::fromUtf8(temp));
             temp.clear();
-            i+=2;
+            i+=1;
 
             temp.clear();
         }

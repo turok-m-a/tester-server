@@ -24,12 +24,7 @@ MainWindow::~MainWindow()
 }
 void MainWindow::handleButton()
 {
-// // меняем текст
-// m_button->setText("Example");
-// // изменяем размер кнопки
-// m_button->resize(100,100);
 }
-
 
 void MainWindow::on_loginButton_clicked()
 {
@@ -61,5 +56,12 @@ void MainWindow::on_loginButton_clicked()
     testWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
     testWindow->setQuestions(questions);
     testWindow->showWindow();
+    }
+}
+
+void MainWindow::on_studentSwitch_toggled(bool checked)
+{
+    if(checked){
+        ui->password->setEnabled(false);
     }
 }

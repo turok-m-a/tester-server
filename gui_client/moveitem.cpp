@@ -81,20 +81,30 @@ int MoveItem::getQuestionNumber()
 
 qreal MoveItem::setText(QString _text)
 {
-   lines = 0;
-   int symbolCounter = xSize/14;
-   text = _text;
+   lines = 0;   //подсчет кол-ва строк с учетом переноса слов
+   int symbolCounter = xSize/6;
+
    for(int i=0;i<_text.size();i++){
        if(_text[i] == "\n" || symbolCounter == 0){
-           symbolCounter =  xSize/14;
+           symbolCounter =  xSize/6;
            lines++;
        } else {
+           if (_text[i] == ' ' && (_text.indexOf(' ',i+1)-i) >= symbolCounter ){
+               //перенос слова без разрыва
+               symbolCounter =  xSize/6;
+               lines++;
+               _text.insert(i,'\n');
+               i++;
+           } else {
            symbolCounter--;
+           }
        }
    }
-   if(_text.size()< xSize/14 && lines == 0){
-       lines = 1;
-   }
+//   if(_text.size()< xSize/6 && lines == 0){
+//       lines = 1;
+//   }
+   lines++;
+   text = _text;
    return positionY + lines*15 + 15;
 }
 

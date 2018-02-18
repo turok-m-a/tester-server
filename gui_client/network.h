@@ -19,7 +19,7 @@ public:
            return instance;
        }
     QVector<Question> getQuestionsForStudent(QString studLogin,int & loginStatus);
-    int sendQuestions(QVector<Question> q);
+    float sendQuestions(QVector<Question> q);
 };
 
 #endif // NETWORK_H
