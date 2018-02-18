@@ -25,7 +25,8 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
                 #ifdef WIN32
                 WSACleanup();
                 #endif
-                return questionsContainer;
+                loginStatus = 3; //ошибка соединения
+                return questionsContainer;//нет вопросов
             }
 
     int userType = 1;//студент
@@ -40,10 +41,11 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
     recv(s,(char*)&questionsLen,sizeof(int),0);
     questionBuf = new char[questionsLen];
     int bytesReceived = recv(s,questionBuf,questionsLen,0);
-    if (bytesReceived == sizeof(int)){
+    if (bytesReceived <= sizeof(int)){
         loginStatus = 2;//нет открытого для сдачи экзамена
+        return questionsContainer;
     }
-    if (bytesReceived >= sizeof(int)){
+    if (bytesReceived > sizeof(int)){
         loginStatus = 1;//OK
     }
     closesocket(s);
@@ -128,7 +130,7 @@ int Network::sendQuestions(QVector<Question> questions)
             send(s,(char*)&textLen,4,0);
             send(s,question.getAnswerText().toStdString().c_str(),textLen,0);
         }
-        if (type == 3){
+        if (type == 3 || type == 4){
             int number = question.getAnswersSequence().size();
             number*=sizeof(int);
             send(s,(char*)&number,4,0);

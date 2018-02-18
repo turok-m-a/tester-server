@@ -55,7 +55,7 @@ void connectionThread::processStudentAnswers()
         QString answer = QString::fromUtf8(utf8string,textLen);
         testMark += db.checkAnswer(id,answer);
     }
-    if (type == 3){
+    if (type == 3 || type == 4){
         int number;
         QVector<int> answers;
         recv(sockDescriptor,(char*)&number,4,0);

@@ -3,9 +3,10 @@
 
 #include <QMainWindow>
 #include "testwindow.h"
+#include <infowindow.h>
 #include <QPushButton>
 #include <network.h>
-#include <connectionerror.h>
+#include <constants.h>
 class TestWindow;
 namespace Ui {
 class MainWindow;
@@ -21,6 +22,7 @@ public:
 
 private:
     Ui::MainWindow * ui;
+    infowindow * infoWindow;
     TestWindow * testWindow;
 
 private slots:

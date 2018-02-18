@@ -52,7 +52,7 @@ Question::Question(QString rawText, int _id, int _type) : id(_id), type(_type)
     rawQuestionText = rawText;
     int answerSignPosition;
     QVector<int> answerSignPositions;
-    if(type == SELECT_QUESTION_TYPE){
+    if(type == SELECT_QUESTION_TYPE || type == MATCH_QUESTION_TYPE){
         for(int i =0;i<rawQuestionText.size();i++){
             answerSignPosition = rawQuestionText.indexOf('$',i);
             if (answerSignPosition == -1) break;
@@ -106,6 +106,10 @@ void Question::addAnswer(QVector<int> a)
 void Question::addAdvancedData(QByteArray data)
 {
     advData = data;
+    if(type == MATCH_QUESTION_TYPE){
+        groupNumber = advData.at(0);
+    }
+
 }
 
 void Question::resetAnswer()

@@ -69,10 +69,4 @@ QVector<int> SequenceQuestionDrawer::getSequence()
     return answerSequence;
 }
 
-SequenceQuestionDrawer::~SequenceQuestionDrawer()
-{
-    MoveItem * i;
-    foreach (i, guiObjects) {
-        delete i;
-    }
-}
+SequenceQuestionDrawer::~SequenceQuestionDrawer(){}

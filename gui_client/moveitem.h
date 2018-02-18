@@ -12,7 +12,7 @@ class MoveItem : public QObject,public QGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit MoveItem(QObject *parent = 0);
+    explicit MoveItem(QObject *parent = 0, int xgrid = INT_MAX, int ygrid = 15,int xsize = 400);
     ~MoveItem();
     qreal setText(QString _text);
     void setPositionY(qreal pos);
@@ -30,7 +30,9 @@ private:
     QString text;
     int lines;
     qreal positionY;
-
+    int xGrid;
+    int yGrid;
+    int xSize;
 public slots:
 };
 

@@ -78,7 +78,7 @@ int dataBase::checkAnswer(int id,QVector<int> answers)
             return query.value(2).toInt();
         }
     }
-    if (type == 3){
+    if (type == 3 ||type == 4){
         QString _correctAnswers = query.value(1).toString();
         QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
         QVector<int> tmp;
@@ -153,7 +153,7 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
     stream << q_text;
     int adv_data_len = 0;
     QByteArray adv_data = query.value(3).toByteArray();
-    if (! query.value(3).isNull()) {
+    if (! query.value(3).isNull()) {    //3 и 4 тип содержат доп. данные
     adv_data_len = query.value(3).toByteArray().size();
     stream << adv_data;
     } else {

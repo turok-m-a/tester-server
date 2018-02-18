@@ -7,7 +7,7 @@
 #define SELECT_QUESTION_TYPE 1  //выбор одного или нескольких вариантов
 #define INPUT_QUESTION_TYPE 2   //ввод ответа с клавиатуры
 #define SEQUENCE_QUESTION_TYPE 3//выбор последовательности действий
-#define MATCH_QUESTION_TYPE 4   //сопоставление
+#define MATCH_QUESTION_TYPE 4   //выбор группы
 class Question
 {
 private:
@@ -17,8 +17,10 @@ private:
     QVector<QString> answers;   //варианты ответов
     QVector<int> selectedAnswers; //тип вопроса 1
     QString answerText;      //тип 2
-    QVector<int> answer;       //тип 3,4
+    QVector<int> answer;       //тип 3
+    //QVector<QPair<QString,int>> groupAnswers; //тип 4
     QByteArray advData;
+    int groupNumber;
 public:
     int type;
     bool isAnswered;

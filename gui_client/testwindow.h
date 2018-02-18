@@ -8,8 +8,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <network.h>
-
+#include <infowindow.h>
 #include <sequencequestiondrawer.h>
+#include <groupquestiondrawer.h>
 namespace  Ui {
     class TestWindow;
 }
@@ -35,9 +36,11 @@ private:
     void showQuestion(int number);
     void hideQuestion();
     void showSequenceQuestion(QVector<int> restoreSequence = QVector<int>());
+    void showMatchQuestion(QVector<int> restoreSequence = QVector<int>());
     QVector<QObject *> guiObjects;
     QGraphicsScene * scene;
     SequenceQuestionDrawer * drawer;
+    GroupQuestionDrawer * gDrawer;
 };
 
 #endif // TESTWINDOW_H

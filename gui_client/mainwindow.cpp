@@ -37,10 +37,28 @@ void MainWindow::on_loginButton_clicked()
     QVector<Question> questions;
     int loginStatus;
     questions = network.getQuestionsForStudent(ui->login->text(),loginStatus);
+    if (questions.isEmpty()){
+        infoWindow = new infowindow();
+        infoWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
+        switch (loginStatus) {
+        case CONN_NOT_FOUND:
+            infoWindow->setMessage("Неправильный номер ст. билета либо нет допуска к экзамену");
+            break;
+        case CONN_ERROR:
+            infoWindow->setMessage("Нет соединеия с сервером");
+            break;
+        default:
+            infoWindow->setMessage("Неизвестная ошибка");
+            break;
+        }
+        infoWindow->show();
+        return;
+    }
     if (loginStatus == CONN_OK){
     network.studLogin = ui->login->text();
     network.currentUserType = 1;
     testWindow = new TestWindow();
+    testWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
     testWindow->setQuestions(questions);
     testWindow->showWindow();
     }

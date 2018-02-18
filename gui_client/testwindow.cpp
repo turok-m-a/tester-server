@@ -40,8 +40,10 @@ void TestWindow::on_submitButton_clicked()
     hideQuestion();
     Network & network = Network::getInstance();
     int mark = network.sendQuestions(questions);
-    ui->label->setText(QString::number(mark));
-   // this->hide();
+    infowindow * infoWindow = new infowindow(0,QString("\nВаша оценка: ") +  QString::number(mark));
+    infoWindow->show();
+    //ui->label->setText(QString("\nВаша оценка: ") +  QString::number(mark));
+    this->close();
 }
 
 void TestWindow::showQuestion(int number)
@@ -60,7 +62,9 @@ void TestWindow::showQuestion(int number)
     if (type == SELECT_QUESTION_TYPE){
         int answerNumber = questions[number].getAnswerNumber();
         for (int i=0;i<answerNumber;i++){
-            QCheckBox * checkBox = new QCheckBox(questions[number].getAnswerText(i), this);
+            QString answer = questions[number].getAnswerText(i);
+            answer.remove(0,2);
+            QCheckBox * checkBox = new QCheckBox(answer, this);
             guiObjects.push_back(checkBox);
             checkBox->setGeometry(600,100+i*50,500,25);
             QFont f;
@@ -84,6 +88,21 @@ void TestWindow::showQuestion(int number)
     }
     if (type == SEQUENCE_QUESTION_TYPE){
         showSequenceQuestion(questions[currentQuestion].getAnswersSequence());
+    }
+    if (type == MATCH_QUESTION_TYPE){
+        int answerNumber = questions[number].getAnswerNumber();
+        for (int i=0;i<answerNumber;i++){
+            QString answer = questions[number].getAnswerText(i);
+            answer.remove(0,2);
+            QLabel * label = new QLabel(answer, this);
+            guiObjects.push_back(label);
+            label->setGeometry(i*(WINDOW_WIDTH/answerNumber),10,500,25);
+            QFont f;
+            f.setPixelSize(14);
+            label->setFont(f);
+            label->show();
+        }
+        showMatchQuestion(questions[currentQuestion].getAnswersSequence());
     }
 }
 
@@ -109,6 +128,12 @@ void TestWindow::hideQuestion() //сохранение ответов и скр�
     if (questions[currentQuestion].type == SEQUENCE_QUESTION_TYPE){
         questions[currentQuestion].addAnswer( drawer->getSequence());
         delete scene;
+        delete drawer;
+    }
+    if (questions[currentQuestion].type == MATCH_QUESTION_TYPE){
+        questions[currentQuestion].addAnswer( gDrawer->getSequence());
+        delete scene;
+        delete gDrawer;
     }
     QObject* i;
     foreach (i, guiObjects) {
@@ -134,4 +159,22 @@ void TestWindow::showSequenceQuestion(QVector<int> restoreSequence)
     drawer = new SequenceQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene,restoreSequence);
     //guiObjects.push_back(reinterpret_cast<QObject*>(drawer));
 
+}
+
+void TestWindow::showMatchQuestion(QVector<int> restoreSequence)
+{
+    scene = new QGraphicsScene(this);   // Инициализируем графическую сцену
+    scene->setItemIndexMethod(QGraphicsScene::NoIndex); // настраиваем индексацию элементов
+    QGraphicsView * graphicsView = new QGraphicsView(this);
+    guiObjects.push_back(graphicsView);
+    graphicsView->resize(400,600);  // Устанавливаем размер graphicsView
+    graphicsView->setGeometry(0,60,1000,470);
+    graphicsView->setScene(scene);  // Устанавливаем графическую сцену в graphicsView
+    graphicsView->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
+    graphicsView->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
+    graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    graphicsView->show();
+    scene->setSceneRect(0,0,950,440); // Устанавливаем размер сцены
+    gDrawer = new GroupQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene,restoreSequence);
+    //guiObjects.push_back(reinterpret_cast<QObject*>(drawer));
 }

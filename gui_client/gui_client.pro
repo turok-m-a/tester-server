@@ -30,18 +30,23 @@ SOURCES += \
     question.cpp \
     network.cpp \
     moveitem.cpp \
-    sequencequestiondrawer.cpp
+    sequencequestiondrawer.cpp \
+    groupquestiondrawer.cpp \
+    infowindow.cpp
 
 HEADERS += \
         mainwindow.h \
     testwindow.h \
     question.h \
     network.h \
-    connectionerror.h \
     moveitem.h \
-    sequencequestiondrawer.h
+    sequencequestiondrawer.h \
+    groupquestiondrawer.h \
+    constants.h \
+    infowindow.h
 
 FORMS += \
         mainwindow.ui \
-    testwindow.ui
+    testwindow.ui \
+    infowindow.ui
 win32: LIBS += -lws2_32
