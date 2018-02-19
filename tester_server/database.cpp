@@ -58,6 +58,19 @@ int dataBase::getUserId(QString name)
      return -1;
 }
 
+bool dataBase::checkUser(QString userName, QString password)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT login,password FROM tester.users WHERE login = ? AND password =?");
+    query.addBindValue(userName);
+    query.addBindValue(password);
+    query.exec();
+    if (query.next()){
+        return true;
+    }
+    return false;
+}
+
 int dataBase::checkAnswer(int id,QVector<int> answers)
 {
     QSqlQuery query(db);
@@ -171,6 +184,50 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
     }
     }
     return byteArray;
+}
+
+QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<QString> values)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT first_name,middle_name,last_name,group,stud_document_id,stud_id FROM tester.students "
+                "WHERE ? ");
+    QString where;
+    for (int i=0;i<params.size();i++){
+        switch (params[i]) {
+        case FILTER_FIRST_NAME:
+            where += QString(" first_name LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_MIDDLE_NAME:
+            where += QString(" middle_name LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_LAST_NAME:
+            where += QString(" last_name LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_STUD_GROUP:
+            where += QString(" group LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_STUD_TICKET:
+            where += QString(" stud_document_id LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        default:
+            break;
+        }
+        if (i < (params.size()-1)){
+            where += QString(" AND ");
+        }
+    }
+    query.addBindValue(where);
+    query.exec();
+    QVector<QVector<QString>> students;
+
+    while(query.next()){
+        QVector<QString> student;
+        for (int i=0;i<6;i++){
+        student.push_back(query.value(i).toString());
+        }
+        students.push_back(student);
+    }
+    return students;
 }
 
 

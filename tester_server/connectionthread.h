@@ -5,6 +5,8 @@
 #include <database.h>
 #include <QByteArray>
 #include <QVector>
+#include <constants.h>
+#include <cmdprocess.h>
 class connectionThread : public QThread
 {
 private:

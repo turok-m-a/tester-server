@@ -6,6 +6,94 @@ Network::Network()
     WSAStartup(MAKEWORD( 2, 2 ),&lp);
 }
 
+void Network::setAddress(QString address)
+{
+    serverAddress = address;
+}
+
+void Network::setUser(QString _login, QString _password)
+{
+    login = _login;
+    password = _password;
+}
+
+int Network::checkUser()
+{
+    SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SOCKADDR_IN serverInfo;
+    LPHOSTENT hostEnt;
+
+    hostEnt = gethostbyname(serverAddress.toStdString().c_str());
+    serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
+    serverInfo.sin_family = PF_INET;
+     serverInfo.sin_port = htons(10001);
+    int retVal=connect(s,(LPSOCKADDR)&serverInfo, sizeof(serverInfo));
+            if(retVal==SOCKET_ERROR)
+            {
+                printf("Unable to connect\n");
+                #ifdef WIN32
+                WSACleanup();
+                #endif
+                int loginStatus = 3; //ошибка соединения
+                return loginStatus;
+            }
+            int userType = 2;//препод/админ
+            int opCode = NOP;
+            char userName[40];
+            strcpy_s(userName,login.toStdString().c_str());
+            char _password[40];
+            strcpy_s(_password,password.toStdString().c_str());
+            send(s,(char*)&userType,4,0);
+            send(s,(char*)&opCode,4,0);
+            send(s,userName,40,0);
+            send(s,_password,40,0);
+       int loginStatus;
+       recv(s,(char*)&loginStatus,sizeof(int),0);
+       return loginStatus;
+       closesocket(s);
+}
+
+QByteArray Network::sendQuery(int opCode, QByteArray query)
+{
+
+    SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    SOCKADDR_IN serverInfo;
+    LPHOSTENT hostEnt;
+
+    hostEnt = gethostbyname(serverAddress.toStdString().c_str());
+    serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
+    serverInfo.sin_family = PF_INET;
+     serverInfo.sin_port = htons(10001);
+    int retVal=connect(s,(LPSOCKADDR)&serverInfo, sizeof(serverInfo));
+            if(retVal==SOCKET_ERROR)
+            {
+                printf("Unable to connect\n");
+                #ifdef WIN32
+                WSACleanup();
+                #endif
+                return QByteArray();
+            }
+            int userType = 2;//препод/админ
+            int _opCode = opCode;
+            char userName[40];
+            strcpy_s(userName,login.toStdString().c_str());
+            char _password[40];
+            strcpy_s(_password,password.toStdString().c_str());
+            send(s,(char*)&userType,4,0);
+            send(s,(char*)&_opCode,4,0);
+            send(s,userName,40,0);
+            send(s,_password,40,0);
+       int loginStatus;
+       recv(s,(char*)&loginStatus,sizeof(int),0);
+       int replySize;
+       send(s,query.data(),query.size(),0);
+       recv(s,(char*)&replySize,sizeof(int),0);
+       QByteArray reply;
+       reply.reserve(replySize);
+       recv(s,reply.data(),replySize,0);
+       closesocket(s);
+}
+
 QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginStatus)
 {
     QVector<Question> questionsContainer;
@@ -13,7 +101,7 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
     SOCKADDR_IN serverInfo;
     LPHOSTENT hostEnt;
 
-    hostEnt = gethostbyname("localhost");
+    hostEnt = gethostbyname("127.0.0.1");
     serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
     serverInfo.sin_family = PF_INET;
      serverInfo.sin_port = htons(10001);

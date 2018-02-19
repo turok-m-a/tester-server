@@ -18,12 +18,16 @@ SOURCES += main.cpp \
     core.cpp \
     database.cpp \
     connection.cpp \
-    connectionthread.cpp
+    connectionthread.cpp \
+    cmdprocess.cpp
 
 HEADERS += \
     core.h \
     database.h \
     connection.h \
     connectionthread.h \
-    states.h
+    states.h \
+    cmdprocess.h \
+    connection.h \
+    constants.h
 win32: LIBS += -lws2_32

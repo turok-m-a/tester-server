@@ -13,6 +13,7 @@
 #include <iostream>
 #include <QByteArray>
 #include <QDataStream>
+#include <constants.h>
 using namespace std;
 class dataBase
 {
@@ -31,11 +32,13 @@ public:
     void addSubject(QString name);
     QVector<QString> getSubjects();
     int getUserId(QString name);
+    bool checkUser(QString userName,QString password);
     int checkAnswer(int id,QVector<int> answers);
     int checkAnswer(int id,QString answer);
     int getStudentCurrentExamState(int id,int & subject_id,int & question_select_type,QByteArray & question_list,int & exam_id);
     int getMaxMark(int id);
     QByteArray getQuestionsForExam(QByteArray question_list);
+    QVector<QVector <QString>> findStudents(QVector<int> params,QVector<QString> values);
 };
 
 #endif // DATABASE_H

@@ -32,7 +32,9 @@ SOURCES += \
     moveitem.cpp \
     sequencequestiondrawer.cpp \
     groupquestiondrawer.cpp \
-    infowindow.cpp
+    infowindow.cpp \
+    teacherwindow.cpp \
+    studcontrolwindow.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,10 +45,14 @@ HEADERS += \
     sequencequestiondrawer.h \
     groupquestiondrawer.h \
     constants.h \
-    infowindow.h
+    infowindow.h \
+    teacherwindow.h \
+    studcontrolwindow.h
 
 FORMS += \
         mainwindow.ui \
     testwindow.ui \
-    infowindow.ui
+    infowindow.ui \
+    teacherwindow.ui \
+    studcontrolwindow.ui
 win32: LIBS += -lws2_32

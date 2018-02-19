@@ -2,7 +2,20 @@
 
 void connectionThread::processStudent()
 {
+    char buf[40];//username
+    recv(sockDescriptor,buf,sizeof(buf),0);
+
+    QString userName(buf);
     dataBase & db = dataBase::getInstance();
+    userId= db.getUserId(userName);
+    if (userId < 0){
+        int code = 2;//не найден
+        send(sockDescriptor,(char*)&code,4,0);
+        closesocket(sockDescriptor);
+        return;
+    }
+
+
     int subject_id,status,select_type;
     status = db.getStudentCurrentExamState(userId,subject_id,select_type,question_list,exam_id);
     if (status != 11){
@@ -23,6 +36,29 @@ void connectionThread::processStudent()
     }
     //to-do: рандомные вопросы по предмету
 
+}
+
+void connectionThread::processTeacher()
+{
+    dataBase & db = dataBase::getInstance();
+    char buf[40];//username
+    recv(sockDescriptor,buf,sizeof(buf),0);
+    QString userName(buf);
+    //password
+    recv(sockDescriptor,buf,sizeof(buf),0);
+    QString password(buf);
+    bool userExists = db.checkUser(userName,password);
+    if (userExists) {
+       int status = CONN_OK;
+       send(sockDescriptor,(char*)&status,sizeof(int),0);
+    } else {
+        int status = CONN_NOT_FOUND;
+        send(sockDescriptor,(char*)&status,sizeof(int),0);
+        closesocket(sockDescriptor);
+        return;
+    }
+    CmdProcess proc(opCode,sockDescriptor);
+    closesocket(sockDescriptor);
 }
 
 void connectionThread::processStudentAnswers()
@@ -82,18 +118,14 @@ connectionThread::connectionThread(SOCKET s, QObject *parent) :
 void connectionThread::run()
 {
     cout << "thread start\n";
-    if(!authorization()) {
-        int code = 1;//студента с таким № билета нет
-        send(sockDescriptor,(char*)&code,4,0);
-        closesocket(sockDescriptor);
-        return;
-    }
+    recv(sockDescriptor,(char*)&userType,sizeof(int),0);
+    recv(sockDescriptor,(char*)&opCode,sizeof(int),0);
     switch (userType) {
     case 1:
         processStudent();
         break;
     case 2:
-        //processTeacher();
+        processTeacher();
         break;
     default:
         break;
@@ -102,20 +134,6 @@ void connectionThread::run()
 
 bool connectionThread::authorization()
 {
-    recv(sockDescriptor,(char*)&userType,sizeof(int),0);
-    recv(sockDescriptor,(char*)&opCode,sizeof(int),0);
-    char buf[40];
-    recv(sockDescriptor,buf,sizeof(buf),0);
-    QString userName(buf);
-    dataBase & db = dataBase::getInstance();
-    userId= db.getUserId(userName);
-    if (userId < 0){
-        cout<<"auth fail\n";
-        cout << " ";
-        return false;
-    }
-    else{
-        cout<<"auth success\n";
-        return true;
-    }
+
+    return true;
 }
