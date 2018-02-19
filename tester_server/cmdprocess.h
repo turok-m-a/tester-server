@@ -4,6 +4,7 @@
 #include <constants.h>
 #include <QVector>
 #include <database.h>
+#include <QDataStream>
 class CmdProcess
 {
 public:
@@ -11,6 +12,7 @@ public:
     CmdProcess(int opCode,SOCKET _sock);
 private:
     void sendStudList();
+    void addStudToList();
     SOCKET sock;
 };
 

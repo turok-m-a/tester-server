@@ -39,6 +39,7 @@ public:
     int getMaxMark(int id);
     QByteArray getQuestionsForExam(QByteArray question_list);
     QVector<QVector <QString>> findStudents(QVector<int> params,QVector<QString> values);
+    void addStudent(QVector<QString> values);
 };
 
 #endif // DATABASE_H

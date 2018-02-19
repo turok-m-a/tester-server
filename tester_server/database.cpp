@@ -9,14 +9,14 @@ dataBase::dataBase()
     db.setPassword("12345");
      // cout << db.lastError().number()<<endl;
     bool ok = db.open();
-    QSqlQuery query(db);
-    query.exec("SELECT * FROM subjects");
-    while (query.next()) {
-         QString name = QString::fromUtf8(query.value(0).toByteArray());
-         int salary = query.value(1).toInt();
-         string a = name.toStdString();
-         cout <<a << salary;
-       }
+//    QSqlQuery query(db);
+//    query.exec("SELECT * FROM subjects");
+//    while (query.next()) {
+//         QString name = QString::fromUtf8(query.value(0).toByteArray());
+//         int salary = query.value(1).toInt();
+//         string a = name.toStdString();
+//         cout <<a << salary;
+//       }
 }
 
 
@@ -189,25 +189,24 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
 QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<QString> values)
 {
     QSqlQuery query(db);
-    query.prepare("SELECT first_name,middle_name,last_name,group,stud_document_id,stud_id FROM tester.students "
-                "WHERE ? ");
+    QString queryString("SELECT first_name,middle_name,last_name, students.group ,stud_document_id,stud_id FROM tester.students WHERE ");
     QString where;
     for (int i=0;i<params.size();i++){
         switch (params[i]) {
         case FILTER_FIRST_NAME:
-            where += QString(" first_name LIKE '%") + values[i] + QString("%' "); ;
+            where += QString("first_name LIKE '%") + values[i] + QString("%' "); ;
             break;
         case FILTER_MIDDLE_NAME:
-            where += QString(" middle_name LIKE '%") + values[i] + QString("%' "); ;
+            where += QString("middle_name LIKE '%") + values[i] + QString("%' "); ;
             break;
         case FILTER_LAST_NAME:
-            where += QString(" last_name LIKE '%") + values[i] + QString("%' "); ;
+            where += QString("last_name LIKE '%") + values[i] + QString("%' "); ;
             break;
         case FILTER_STUD_GROUP:
-            where += QString(" group LIKE '%") + values[i] + QString("%' "); ;
+            where += QString("students.group LIKE '%") + values[i] + QString("%' "); ;
             break;
         case FILTER_STUD_TICKET:
-            where += QString(" stud_document_id LIKE '%") + values[i] + QString("%' "); ;
+            where += QString("stud_document_id LIKE '%") + values[i] + QString("%' "); ;
             break;
         default:
             break;
@@ -216,10 +215,13 @@ QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<Q
             where += QString(" AND ");
         }
     }
-    query.addBindValue(where);
-    query.exec();
+    queryString += where;
+    query.exec(queryString);
+//    if(params.isEmpty()){
+//         query.prepare("SELECT first_name,middle_name,last_name,'group',stud_document_id,stud_id FROM tester.students ");
+//         //нет параметров фильтра
+//    }
     QVector<QVector<QString>> students;
-
     while(query.next()){
         QVector<QString> student;
         for (int i=0;i<6;i++){
@@ -228,6 +230,25 @@ QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<Q
         students.push_back(student);
     }
     return students;
+}
+
+void dataBase::addStudent(QVector<QString> values)
+{
+    QSqlQuery query(db),query2(db);
+     query.exec("SELECT MAX(stud_id) FROM tester.students");
+     query.next();
+     int maxId = query.value(0).toInt() +1;
+
+    QString queryString("INSERT INTO tester.students (first_name,middle_name,last_name, `students`.`group` ,stud_document_id,stud_id) VALUES ( ");
+    for  (int i=0;i<5;i++){
+       queryString+=( values[i]);
+       queryString+= ", ";
+    }
+    queryString+=( QString::number(maxId));
+    queryString+= ")";
+    query2.exec(queryString);
+    cout << query2.lastError().text().toStdString();
+    QString a(query2.executedQuery());
 }
 
 

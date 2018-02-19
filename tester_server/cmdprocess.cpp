@@ -12,6 +12,9 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
     case GET_STUDENT_LIST:
         sendStudList();
         break;
+    case ADD_STUDENT:
+        addStudToList();
+        break;
     default:
         break;
     }
@@ -19,34 +22,65 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
 
 void CmdProcess::sendStudList()
 {
-    int filterParamNum,filterParam,paramLen;
-    recv(sock,(char*)&filterParamNum,sizeof(int),0);//число параметров
+    int filterParamNum,byteArrayLen;
+   // recv(sock,(char*)&filterParamNum,sizeof(int),0);//число параметров
     QVector<int> filterParams;
     QVector<QString> filterValues;
+
+
+    QByteArray byteArray;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream >> filterParamNum; //кол-во пар-ров
     for (int i=0;i<filterParamNum;i++){
-        recv(sock,(char*)&filterParam,sizeof(int),0);
-        filterParams.push_back(filterParam);
-        recv(sock,(char*)&paramLen,sizeof(int),0);
-        char * buf = new char[paramLen];
-        recv(sock,buf,paramLen,0);
-        filterValues.push_back(QString(buf));
-        delete buf;
+        int param;
+        QString value;
+          stream >> param;
+          stream >> value;
+       filterParams.push_back(param);
+       filterValues.push_back(value);
     }
     dataBase & db = dataBase::getInstance();
     QVector<QVector <QString>> students = db.findStudents(filterParams,filterValues);
 
-    QByteArray byteArray;
-    QDataStream stream(&byteArray, QIODevice::WriteOnly);
-    stream.setByteOrder(QDataStream::LittleEndian);
-
-
+    QByteArray reply;
+    QDataStream stream2(&reply, QIODevice::WriteOnly);
+    stream2 << students.size();
     for (int i=0;i<students.size();i++){
         for (int j=0;j<6;j++){
-            stream << students[i][j];
+            stream2 << students[i][j];
         }
     }
-    int size = byteArray.size();
+    int size = reply.size();
     send(sock,(char*)&size,sizeof(int),0);
-    send(sock,byteArray.data(),size,0);
+    send(sock,reply.data(),size,0);
 
+}
+
+void CmdProcess::addStudToList()
+{
+    int byteArrayLen;
+    QVector<int> params;
+    QVector<QString> values;
+
+    QByteArray byteArray;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    stream.setByteOrder(QDataStream::LittleEndian);
+
+    for (int i=0;i<5;i++){
+        int param;
+        QString value;
+          stream >> param;
+          stream >> value;
+       params.push_back(param);
+       values.push_back(value);
+    }
+    dataBase & db = dataBase::getInstance();
+    db.addStudent(values);
 }

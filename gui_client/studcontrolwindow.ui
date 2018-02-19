@@ -64,7 +64,7 @@
      <string>фамилия</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="group">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -80,7 +80,7 @@
      <string>группа</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_2">
+   <widget class="QLineEdit" name="ticket">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -93,7 +93,7 @@
      <string>№ст. билета</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="findButton">
     <property name="geometry">
      <rect>
       <x>510</x>
@@ -106,7 +106,7 @@
      <string>Найти</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="addButton">
     <property name="geometry">
      <rect>
       <x>510</x>
@@ -129,6 +129,39 @@
      <height>351</height>
     </rect>
    </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>126</number>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>Фамилия</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Имя</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Отчество</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>группа</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>№ст. билета</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>ID</string>
+    </property>
+   </column>
   </widget>
   <widget class="QPushButton" name="delete_2">
    <property name="geometry">

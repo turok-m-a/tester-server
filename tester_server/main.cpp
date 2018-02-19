@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 #ifndef linux
-    system("chcp 65001 > NULL");//перекл. консоль в utf-8
+    //system("chcp 65001 > NULL");//перекл. консоль в utf-8
 #endif
     QCoreApplication a(argc, argv);
 

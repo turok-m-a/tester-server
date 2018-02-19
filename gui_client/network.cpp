@@ -85,13 +85,16 @@ QByteArray Network::sendQuery(int opCode, QByteArray query)
             send(s,_password,40,0);
        int loginStatus;
        recv(s,(char*)&loginStatus,sizeof(int),0);
-       int replySize;
+       int replySize,querySize;
+       querySize = query.size();
+       send(s,(char*)&querySize,sizeof(int),0);
        send(s,query.data(),query.size(),0);
        recv(s,(char*)&replySize,sizeof(int),0);
        QByteArray reply;
-       reply.reserve(replySize);
+       reply.resize(replySize);
        recv(s,reply.data(),replySize,0);
        closesocket(s);
+       return reply;
 }
 
 QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginStatus)
