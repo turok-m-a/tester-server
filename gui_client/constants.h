@@ -13,8 +13,8 @@
 #define START_EXAM_FOR_STUDENT 10
 #define FORCED_EXAM_FINISH 11
 #define ADD_QUESTION 12
-#define REMOVE_QUESTION 12
-#define GET_QUESTION_LIST 12
+#define REMOVE_QUESTION 21
+#define GET_QUESTION_LIST 22
 #define NOP 13
 #define SUCCESS 14
 #define FAIL 15
@@ -30,4 +30,7 @@
 #define INPUT_QUESTION_TYPE 2   //ввод ответа с клавиатуры
 #define SEQUENCE_QUESTION_TYPE 3//выбор последовательности действий
 #define MATCH_QUESTION_TYPE 4   //выбор группы
+#define EDIT_SUBJECT_LIST_FOR_QUESTION 19
+#define SUBJECT_LIST_FOR_QUESTION_ADD 20
+#define SUBJECT_LIST_FOR_QUESTION_REMOVE 24
 #endif // CONNECTIONERROR_H

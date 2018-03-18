@@ -52,7 +52,7 @@
    </attribute>
    <column>
     <property name="text">
-     <string>Тип вопроса</string>
+     <string>Тип</string>
     </property>
    </column>
    <column>
@@ -84,7 +84,7 @@
   <widget class="QPushButton" name="addQuestion">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>190</x>
      <y>60</y>
      <width>111</width>
      <height>23</height>
@@ -97,7 +97,7 @@
   <widget class="QPushButton" name="delQuestion">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>190</x>
      <y>90</y>
      <width>111</width>
      <height>23</height>
@@ -169,7 +169,7 @@
   <widget class="QPushButton" name="pushButton_2">
    <property name="geometry">
     <rect>
-     <x>470</x>
+     <x>310</x>
      <y>90</y>
      <width>261</width>
      <height>23</height>
@@ -182,7 +182,7 @@
   <widget class="QPushButton" name="pushButton_3">
    <property name="geometry">
     <rect>
-     <x>470</x>
+     <x>310</x>
      <y>60</y>
      <width>261</width>
      <height>21</height>
@@ -190,6 +190,32 @@
    </property>
    <property name="text">
     <string>Сформировать экзамен с выбранными вопросами</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addToSubject">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>120</y>
+     <width>261</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Добавить к предмету:</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="subjectList2">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>120</y>
+     <width>151</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Предмет, к которому требуется добавить вопрос</string>
    </property>
   </widget>
  </widget>

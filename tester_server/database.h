@@ -34,6 +34,8 @@ public:
     void delSubject(int id);
     QVector<QVector<QString> > findSubject(QString name);
     QVector<QVector<QString> > getQuestions(int id);
+    void removeQuestion(int id);
+    void editQuestionSubjects(int questionId,int editOperationType,int subjId);
     QVector<QString> getSubjects();
     int getUserId(QString name);
     bool checkUser(QString userName,QString password);

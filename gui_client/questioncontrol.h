@@ -19,6 +19,12 @@ public:
 private slots:
     void on_subjectList_currentIndexChanged(int index);
 
+    void on_delQuestion_clicked();
+
+    void on_pushButton_2_clicked();
+
+    void on_addToSubject_clicked();
+
 private:
     Ui::QuestionControl *ui;
     QVector<QString> subjectName;

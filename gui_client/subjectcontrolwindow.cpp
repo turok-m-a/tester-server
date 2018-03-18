@@ -57,6 +57,7 @@ void SubjectControlWindow::on_addButton_clicked()
 
 void SubjectControlWindow::on_deleteButton_clicked()
 {
+    if (ui->tableWidget->selectedItems().isEmpty()) return;
     int selectedRow = ui->tableWidget->selectedItems().first()->row();
     QString id = ui->tableWidget->item(selectedRow,1)->text();
     Network & network = Network::getInstance();

@@ -30,11 +30,48 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
     case GET_QUESTION_LIST:
         getQuestionList();
         break;
+    case REMOVE_QUESTION:
+        removeQuestion();
+        break;
+    case EDIT_SUBJECT_LIST_FOR_QUESTION:
+        editQuestionSubjects();
+        break;
     default:
         break;
     }
 }
+void CmdProcess::removeQuestion()
+{
+    int byteArrayLen;
+    QByteArray byteArray,reply;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    int questionId;
+    stream >> questionId;
+    dataBase & db = dataBase::getInstance();
+    db.removeQuestion(questionId);
+    const int replySize = 0;
+    send(sock,(char*)&replySize,sizeof(int),0);
+}
 
+void CmdProcess::editQuestionSubjects()
+{
+    int byteArrayLen;
+    QByteArray byteArray,reply;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    int questionId,editOperationType,subjId;
+    stream >> questionId >> editOperationType >> subjId;
+    dataBase & db = dataBase::getInstance();
+    db.editQuestionSubjects(questionId,editOperationType,subjId);
+    const int replySize = 0;
+    send(sock,(char*)&replySize,sizeof(int),0);
+}
 void CmdProcess::getQuestionList()
 {
     int byteArrayLen;
@@ -54,6 +91,8 @@ void CmdProcess::getQuestionList()
     send(sock,(char*)&replySize,sizeof(int),0);
     send(sock,reply.data(),replySize,0);
 }
+
+
 void CmdProcess::sendStudList()
 {
     int filterParamNum,byteArrayLen;

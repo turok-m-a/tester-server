@@ -125,6 +125,7 @@ void StudControlWindow::on_addButton_clicked()
 
 void StudControlWindow::on_delete_2_clicked()
 {
+    if (ui->tableWidget->selectedItems().isEmpty()) return;
     int selectedRow = ui->tableWidget->selectedItems().first()->row();
     QString id = ui->tableWidget->item(selectedRow,5)->text();
     Network & network = Network::getInstance();

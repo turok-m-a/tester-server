@@ -18,6 +18,8 @@ private:
     void findSubject();
     void removeSubject();
     void getQuestionList();
+    void removeQuestion();
+    void editQuestionSubjects();
     SOCKET sock;
 };
 

@@ -174,6 +174,45 @@ QVector<QVector<QString> > dataBase::getQuestions(int id)
     }
     return questions;
 }
+
+void dataBase::removeQuestion(int id)
+{
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM tester.questions WHERE q_id = ?");
+    query.addBindValue(id);
+    query.exec();
+}
+
+void dataBase::editQuestionSubjects(int questionId, int editOperationType, int subjId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT subject_id FROM tester.questions WHERE q_id = ?");
+    query.addBindValue(questionId);
+    query.exec();
+    query.next();
+    QStringList subjects = query.value(0).toString().split(";",QString::SkipEmptyParts);
+
+    QString newSubjList;
+    if (editOperationType == SUBJECT_LIST_FOR_QUESTION_REMOVE){
+        if (subjects.size() == 1){     //если этот предмет - единственный, к которому привязан вопрос
+            removeQuestion(questionId);//удаляем вопрос
+            return;
+        }
+     foreach (QString subjNumber, subjects) {
+        if (subjNumber != QString::number(subjId)){
+            newSubjList.append(subjNumber+";");
+        }
+     }
+    newSubjList.chop(1);
+    } else {
+        newSubjList = query.value(0).toString()+";"+QString::number(subjId);
+    }
+    QString updateQuery("UPDATE questions SET subject_id='");
+    updateQuery.append(newSubjList);
+    updateQuery.append("' WHERE q_id = ");
+    updateQuery.append(QString::number(questionId));
+    query.exec(updateQuery);
+}
 int dataBase::checkAnswer(int id,QVector<int> answers)
 {
     QSqlQuery query(db);
