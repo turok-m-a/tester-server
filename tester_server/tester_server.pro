@@ -31,3 +31,4 @@ HEADERS += \
     connection.h \
     constants.h
 win32: LIBS += -lws2_32
+-static

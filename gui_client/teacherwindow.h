@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <studcontrolwindow.h>
+#include <subjectcontrolwindow.h>
+#include <questioncontrol.h>
 namespace Ui {
 class TeacherWindow;
 }
@@ -17,6 +19,10 @@ public:
 
 private slots:
     void on_studControl_clicked();
+
+    void on_subjectControl_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::TeacherWindow *ui;

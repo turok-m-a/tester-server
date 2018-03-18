@@ -92,7 +92,9 @@ QByteArray Network::sendQuery(int opCode, QByteArray query)
        recv(s,(char*)&replySize,sizeof(int),0);
        QByteArray reply;
        reply.resize(replySize);
-       recv(s,reply.data(),replySize,0);
+       if (replySize) {
+            recv(s,reply.data(),replySize,0);
+       }
        closesocket(s);
        return reply;
 }

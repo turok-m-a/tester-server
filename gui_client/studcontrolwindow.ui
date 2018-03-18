@@ -129,14 +129,21 @@
      <height>351</height>
     </rect>
    </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::SingleSelection</enum>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectRows</enum>
+   </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
     <number>126</number>
    </attribute>
-   <column>
-    <property name="text">
-     <string>Фамилия</string>
-    </property>
-   </column>
+   <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+    <bool>true</bool>
+   </attribute>
    <column>
     <property name="text">
      <string>Имя</string>
@@ -145,6 +152,11 @@
    <column>
     <property name="text">
      <string>Отчество</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Фамилия</string>
     </property>
    </column>
    <column>

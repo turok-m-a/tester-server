@@ -122,3 +122,16 @@ void StudControlWindow::on_addButton_clicked()
     reply = network.sendQuery(ADD_STUDENT,byteArray);
 
 }
+
+void StudControlWindow::on_delete_2_clicked()
+{
+    int selectedRow = ui->tableWidget->selectedItems().first()->row();
+    QString id = ui->tableWidget->item(selectedRow,5)->text();
+    Network & network = Network::getInstance();
+    QByteArray request,reply;
+    QDataStream stream(&request, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream << id.toInt();
+    reply = network.sendQuery(REMOVE_STUDENT,request);
+    ui->findButton->click();
+}

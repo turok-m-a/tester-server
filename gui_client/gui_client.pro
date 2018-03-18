@@ -34,7 +34,9 @@ SOURCES += \
     groupquestiondrawer.cpp \
     infowindow.cpp \
     teacherwindow.cpp \
-    studcontrolwindow.cpp
+    studcontrolwindow.cpp \
+    subjectcontrolwindow.cpp \
+    questioncontrol.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,12 +49,19 @@ HEADERS += \
     constants.h \
     infowindow.h \
     teacherwindow.h \
-    studcontrolwindow.h
+    studcontrolwindow.h \
+    subjectcontrolwindow.h \
+    questioncontrol.h
 
 FORMS += \
         mainwindow.ui \
     testwindow.ui \
     infowindow.ui \
     teacherwindow.ui \
-    studcontrolwindow.ui
+    studcontrolwindow.ui \
+    subjectcontrolwindow.ui \
+    questioncontrol.ui
 win32: LIBS += -lws2_32
+
+DISTFILES += \
+    classdiagram.qmodel

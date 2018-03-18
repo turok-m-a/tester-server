@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QDataStream>
 #include <constants.h>
+#include <QChar>
 using namespace std;
 class dataBase
 {
@@ -30,6 +31,9 @@ public:
            return instance;
        }
     void addSubject(QString name);
+    void delSubject(int id);
+    QVector<QVector<QString> > findSubject(QString name);
+    QVector<QVector<QString> > getQuestions(int id);
     QVector<QString> getSubjects();
     int getUserId(QString name);
     bool checkUser(QString userName,QString password);
@@ -40,6 +44,9 @@ public:
     QByteArray getQuestionsForExam(QByteArray question_list);
     QVector<QVector <QString>> findStudents(QVector<int> params,QVector<QString> values);
     void addStudent(QVector<QString> values);
+    void removeStudent(int id);
+    QString textQuestionFormat(QString questionText, int type, QString answer);
+    void addOnesToAnswerString(QString & answer);
 };
 
 #endif // DATABASE_H

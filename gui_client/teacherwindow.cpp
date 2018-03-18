@@ -19,3 +19,17 @@ void TeacherWindow::on_studControl_clicked()
     studControlWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
     studControlWindow->show();
 }
+
+void TeacherWindow::on_subjectControl_clicked()
+{
+    SubjectControlWindow * subjectControlWindow = new SubjectControlWindow();
+    subjectControlWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
+    subjectControlWindow->show();
+}
+
+void TeacherWindow::on_pushButton_clicked()
+{
+    QuestionControl * questionControl = new QuestionControl();
+    questionControl->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
+    questionControl->show();
+}

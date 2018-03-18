@@ -28,12 +28,185 @@ void dataBase::addSubject(QString name)
     q2.next();
     int maxId = q2.value(0).toInt();
 
-     query.prepare("INSERT INTO subjects (name, subject_id) VALUES (?, ?)");
-     query.addBindValue(name);
-     query.addBindValue(maxId+1);
+     QString q("INSERT INTO subjects (name, subject_id) VALUES (");
+     name.insert(0,"'");
+     name.append("'");
+     q.append(name+" , ");
+     q.append(QString::number(maxId+1) + ")");
+     query.exec(q);
+}
+
+void dataBase::delSubject(int id)
+{
+    QSqlQuery query(db);
+     query.prepare("DELETE FROM subjects WHERE subject_id = ?");
+     query.addBindValue(id);
      query.exec();
 }
 
+QVector<QVector<QString> > dataBase::findSubject(QString name)
+{
+    QSqlQuery query(db);
+    QString q("SELECT name, subject_id FROM tester.subjects WHERE name LIKE ");
+    name.insert(0,"'%");
+    name.append("%'");
+    q.append(name);
+    query.exec(q);
+    QVector<QVector<QString>> subjects;
+    while(query.next()){
+        QVector<QString> subject;
+        for (int i=0;i<2;i++){
+        subject.push_back(query.value(i).toString());
+        }
+        subjects.push_back(subject);
+    }
+    return subjects;
+}
+QString dataBase::textQuestionFormat(QString questionText,int type,QString answer)
+{
+    if (type == SELECT_QUESTION_TYPE){
+        for(int i =1 ;i<questionText.size();i++){
+            if(questionText[i] == QChar('$') && questionText[i-1] != QChar('#')){
+                questionText[i] = '\n';
+            }
+        }
+        questionText.append("\nправильный(е) ответ(ы):\n");
+        addOnesToAnswerString(answer);
+        questionText.append(answer);
+    }
+    if (type == INPUT_QUESTION_TYPE){
+        questionText.append("\nправильный ответ:\n");
+        questionText.append(answer);
+    }
+    if (type == MATCH_QUESTION_TYPE){
+        for(int i =1 ;i<questionText.size();i++){
+            if(questionText[i] == QChar('$') && questionText[i-1] != QChar('#')){
+                questionText[i] = '\n';
+            }
+        }
+    }
+    return questionText;
+}
+void dataBase::addOnesToAnswerString(QString &answer)
+{
+    QStringList subjectIdList = answer.split(";",QString::SkipEmptyParts);
+    answer.clear();
+    foreach (QString subjectId, subjectIdList) {
+        answer.append( QString::number(subjectId.toInt() + 1) + ";");
+    }
+    answer.chop(1);
+}
+QVector<QVector<QString> > dataBase::getQuestions(int id)
+{
+    QSqlQuery query(db),subquery(db);
+    QString idText = QString::number(id);
+    idText.insert(0,"'%");
+    idText.append("%'");
+    QString q("SELECT q_type,q_text,subject_id,q_id,difficulty,q_answer,q_adv_data FROM questions WHERE subject_id LIKE (");
+    q.append(idText+")");
+    query.exec(q);
+    QVector<QVector<QString> > questions;
+    while(query.next()){
+        QVector<QString> question;
+        question.push_back(query.value(0).toString());
+        const int q_type = query.value(0).toInt();
+        QString questionText = query.value(1).toString();
+        if (q_type == SEQUENCE_QUESTION_TYPE){
+            QByteArray advData = query.value(6).toByteArray();
+            QString sequenceTextNumbered;
+            int currentStep = 2;
+            for (int i=0; i<advData.size();i++) {
+                if(advData[i] == 0){
+                    advData[i] = '\n';
+                }
+            }
+            QString sequenceText(QString::fromUtf8(advData));
+            foreach (QChar c, sequenceText) {
+                sequenceTextNumbered.append(c);
+                if(c == QChar('\n')){
+                    sequenceTextNumbered.append(QString::number(currentStep)+"\n");
+                    currentStep++;
+                }
+            }
+            sequenceTextNumbered.insert(0,"\n1\n");
+            questionText.append("\nПоследовательность этапов в вопросе:"+sequenceTextNumbered);
+            QString correctSequence = query.value(5).toString();
+            addOnesToAnswerString(correctSequence);
+            questionText.append("Правильная последовательность этапов:\n"+correctSequence);
+        }
+        if (q_type == MATCH_QUESTION_TYPE){
+            questionText = textQuestionFormat(questionText,q_type,"");
+            questionText.insert(0,"Для каждого утверждения выбрать одну из групп:");
+            questionText.append("\n");
+            QStringList groupNumbers = query.value(5).toString().split(";",QString::SkipEmptyParts);
+            int groupNumbersIndex = 0;
+            QByteArray advData = query.value(6).toByteArray();
+            advData.remove(0,1);//кол-во групп
+            for (int i=0; i<advData.size();i++) {
+                if(advData[i] == 0){
+                    advData[i] = '\n';
+                }
+            }
+            QString sequenceText(QString::fromUtf8(advData));
+            foreach (QChar c, sequenceText) {
+                questionText.append(c);
+                if(c == QChar('\n')){
+                    questionText.append(" -> "+groupNumbers[groupNumbersIndex]+"\n");
+                    groupNumbersIndex++;
+                }
+            }
+        }
+        question.push_back(textQuestionFormat(questionText,q_type,query.value(5).toString()));
+        QString subjectNames;
+        QStringList subjectIdList = query.value(2).toString().split(";",QString::SkipEmptyParts);
+        foreach (QString subjectId, subjectIdList) {
+            QString subq("SELECT name FROM subjects WHERE subject_id = ");
+            subq.append(subjectId);
+            subquery.exec(subq);
+            subquery.next();
+            subjectNames.append(subquery.value(0).toString()+" \n\r");
+        }
+        question.push_back(subjectNames);
+        for (int i=3;i<5;i++){
+        question.push_back(query.value(i).toString());
+        }
+        questions.push_back(question);
+    }
+    return questions;
+}
+int dataBase::checkAnswer(int id,QVector<int> answers)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT q_id,q_answer,difficulty,q_type FROM tester.questions WHERE q_id = ?");
+    query.addBindValue(id);
+    query.exec();
+    query.next();
+    int type = query.value(3).toInt();
+    if (type == 1){
+        QString _correctAnswers = query.value(1).toString();
+        QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
+        QSet<int> tmp;
+
+        foreach(QString num, correctAnswers){
+            tmp.insert( num.toInt());
+        }
+        if (tmp == answers.toList().toSet()){//последовательность ответов не важна
+            return query.value(2).toInt();
+        }
+    }
+    if (type == 3 ||type == 4){
+        QString _correctAnswers = query.value(1).toString();
+        QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
+        QVector<int> tmp;
+        foreach(QString num, correctAnswers){
+            tmp.push_back(num.toInt());
+        }
+        if (tmp == answers){
+            return query.value(2).toInt();
+        }
+    }
+    return 0;
+}
 QVector<QString> dataBase::getSubjects()
 {
     QSqlQuery query(db);
@@ -71,39 +244,7 @@ bool dataBase::checkUser(QString userName, QString password)
     return false;
 }
 
-int dataBase::checkAnswer(int id,QVector<int> answers)
-{
-    QSqlQuery query(db);
-    query.prepare("SELECT q_id,q_answer,difficulty,q_type FROM tester.questions WHERE q_id = ?");
-    query.addBindValue(id);
-    query.exec();
-    query.next();
-    int type = query.value(3).toInt();
-    if (type == 1){
-        QString _correctAnswers = query.value(1).toString();
-        QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
-        QSet<int> tmp;
 
-        foreach(QString num, correctAnswers){
-            tmp.insert( num.toInt());
-        }
-        if (tmp == answers.toList().toSet()){//последовательность ответов не важна
-            return query.value(2).toInt();
-        }
-    }
-    if (type == 3 ||type == 4){
-        QString _correctAnswers = query.value(1).toString();
-        QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
-        QVector<int> tmp;
-        foreach(QString num, correctAnswers){
-            tmp.push_back(num.toInt());
-        }
-        if (tmp == answers){
-            return query.value(2).toInt();
-        }
-    }
-    return 0;
-}
 
 int dataBase::checkAnswer(int id, QString answer)
 {
@@ -176,7 +317,7 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
     stream << q_text;
     int adv_data_len = 0;
     QByteArray adv_data = query.value(3).toByteArray();
-    if (! query.value(3).isNull()) {    //3 и 4 тип содержат доп. данные
+    if (! query.value(3).isNull()) {    //есть доп. данные
     adv_data_len = query.value(3).toByteArray().size();
     stream << adv_data;
     } else {
@@ -217,10 +358,13 @@ QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<Q
     }
     queryString += where;
     query.exec(queryString);
-//    if(params.isEmpty()){
-//         query.prepare("SELECT first_name,middle_name,last_name,'group',stud_document_id,stud_id FROM tester.students ");
-//         //нет параметров фильтра
-//    }
+    if(params.isEmpty()){
+        query.clear();
+         query.prepare("SELECT first_name,middle_name,last_name, students.group ,stud_document_id,stud_id FROM tester.students ");
+        query.exec();
+         //нет параметров фильтра
+    }
+
     QVector<QVector<QString>> students;
     while(query.next()){
         QVector<QString> student;
@@ -241,15 +385,26 @@ void dataBase::addStudent(QVector<QString> values)
 
     QString queryString("INSERT INTO tester.students (first_name,middle_name,last_name, `students`.`group` ,stud_document_id,stud_id) VALUES ( ");
     for  (int i=0;i<5;i++){
-       queryString+=( values[i]);
+       queryString+=(QString("'") + values[i] + QString("'"));
        queryString+= ", ";
     }
     queryString+=( QString::number(maxId));
     queryString+= ")";
     query2.exec(queryString);
     cout << query2.lastError().text().toStdString();
-    QString a(query2.executedQuery());
+//    QString a(query2.executedQuery());
+
 }
+
+void dataBase::removeStudent(int id)
+{
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM tester.students WHERE stud_id = ?");
+    query.addBindValue(id);
+    query.exec();
+}
+
+
 
 
 

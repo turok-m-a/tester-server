@@ -78,6 +78,9 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="text">
+     <string>ivanii</string>
+    </property>
    </widget>
    <widget class="QLineEdit" name="password">
     <property name="geometry">
@@ -90,6 +93,9 @@
     </property>
     <property name="statusTip">
      <string/>
+    </property>
+    <property name="text">
+     <string>12345</string>
     </property>
     <property name="echoMode">
      <enum>QLineEdit::Password</enum>

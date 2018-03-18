@@ -22,6 +22,8 @@ private slots:
 
     void on_addButton_clicked();
 
+    void on_delete_2_clicked();
+
 private:
     Ui::StudControlWindow *ui;
 };

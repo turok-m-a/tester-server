@@ -13,6 +13,11 @@ public:
 private:
     void sendStudList();
     void addStudToList();
+    void removeStudentFromList();
+    void addSubject();
+    void findSubject();
+    void removeSubject();
+    void getQuestionList();
     SOCKET sock;
 };
 
