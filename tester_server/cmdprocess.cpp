@@ -36,6 +36,9 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
     case EDIT_SUBJECT_LIST_FOR_QUESTION:
         editQuestionSubjects();
         break;
+    case ADD_QUESTION:
+        addQuestion();
+        break;
     default:
         break;
     }
@@ -69,6 +72,28 @@ void CmdProcess::editQuestionSubjects()
     stream >> questionId >> editOperationType >> subjId;
     dataBase & db = dataBase::getInstance();
     db.editQuestionSubjects(questionId,editOperationType,subjId);
+    const int replySize = 0;
+    send(sock,(char*)&replySize,sizeof(int),0);
+}
+
+void CmdProcess::addQuestion()
+{
+    int byteArrayLen;
+    QByteArray byteArray,reply;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+
+    int questionType,subjectId;
+    QString questionText,answerText;
+    QByteArray advData;
+    stream >> questionType >> subjectId >> questionText >> answerText;
+    if (questionType == SEQUENCE_QUESTION_TYPE || questionType == MATCH_QUESTION_TYPE){
+        stream >> advData;
+    }
+    dataBase & db = dataBase::getInstance();
+    db.addQuestion(questionType,subjectId,questionText,answerText,advData);
     const int replySize = 0;
     send(sock,(char*)&replySize,sizeof(int),0);
 }

@@ -20,6 +20,7 @@ private:
     void getQuestionList();
     void removeQuestion();
     void editQuestionSubjects();
+    void addQuestion();
     SOCKET sock;
 };
 

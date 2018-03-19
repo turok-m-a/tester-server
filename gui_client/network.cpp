@@ -24,6 +24,13 @@ int Network::checkUser()
     LPHOSTENT hostEnt;
 
     hostEnt = gethostbyname(serverAddress.toStdString().c_str());
+    if (hostEnt == NULL){
+        #ifdef WIN32
+        WSACleanup();
+        #endif
+        int loginStatus = 3; //ошибка соединения
+        return loginStatus;
+    }
     serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
     serverInfo.sin_family = PF_INET;
      serverInfo.sin_port = htons(10001);

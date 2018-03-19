@@ -213,6 +213,25 @@ void dataBase::editQuestionSubjects(int questionId, int editOperationType, int s
     updateQuery.append(QString::number(questionId));
     query.exec(updateQuery);
 }
+
+void dataBase::addQuestion(int type, int subjId, QString question, QString answer, QByteArray advData)
+{
+    QSqlQuery query(db);
+    query.exec("SELECT MAX(q_id) FROM tester.questions");
+    query.next();
+    int qId = query.value(0).toInt();
+    qId++;
+    QString q("INSERT INTO tester.questions (q_id,q_type,subject_id,q_text,q_answer) VALUES (");
+    q.append(QString::number(qId)+" , "+QString::number(type)+" , "+QString::number(subjId)+" , ");
+    q.append("'"+question+"' , '"+answer+"' )");
+    query.exec(q);
+    if(!advData.isEmpty()){
+        query.prepare("UPDATE tester.questions SET q_adv_data = ? WHERE q_id = ?");
+        query.addBindValue(advData);
+        query.addBindValue(qId);
+        query.exec();
+    }
+}
 int dataBase::checkAnswer(int id,QVector<int> answers)
 {
     QSqlQuery query(db);

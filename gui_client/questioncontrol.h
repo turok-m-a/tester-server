@@ -25,11 +25,22 @@ private slots:
 
     void on_addToSubject_clicked();
 
+    void on_addQuestion_clicked();
+
+    void on_finishQustionAdd_clicked();
+
+    void on_questionType_currentIndexChanged(int index);
+
+    void on_lineEdit_editingFinished();
+
+    void on_answersNumber_editingFinished();
+
 private:
     Ui::QuestionControl *ui;
     QVector<QString> subjectName;
      QVector<int> subjectId;
      bool subjListIsEmpty;
+     void formatQuestionText(QString & text);
 };
 
 #endif // QUESTIONCONTROL_H

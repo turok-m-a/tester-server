@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>802</width>
-    <height>707</height>
+    <height>577</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
      <x>30</x>
      <y>160</y>
      <width>761</width>
-     <height>301</height>
+     <height>391</height>
     </rect>
    </property>
    <property name="editTriggers">
@@ -114,20 +114,20 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>470</y>
+     <y>150</y>
      <width>761</width>
-     <height>221</height>
+     <height>381</height>
     </rect>
    </property>
    <property name="title">
     <string>Добавление</string>
    </property>
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="questionType">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>20</y>
-      <width>121</width>
+      <y>50</y>
+      <width>191</width>
       <height>22</height>
      </rect>
     </property>
@@ -152,17 +152,63 @@
      </property>
     </item>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="finishQustionAdd">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>170</y>
+      <y>140</y>
       <width>191</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Добавить к текущему предмету</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Тип вопроса</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>101</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Кол-во вариантов</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="answersNumber">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>113</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="questionEdit">
+    <property name="geometry">
+     <rect>
+      <x>260</x>
+      <y>20</y>
+      <width>491</width>
+      <height>351</height>
+     </rect>
     </property>
    </widget>
   </widget>
