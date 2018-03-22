@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>290</width>
+    <width>272</width>
     <height>188</height>
    </rect>
   </property>
@@ -53,6 +53,19 @@
    </property>
    <property name="text">
     <string>Управление вопросами</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="examControl">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>100</y>
+     <width>171</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Управление экзаменами</string>
    </property>
   </widget>
  </widget>

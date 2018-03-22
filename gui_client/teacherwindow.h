@@ -5,6 +5,7 @@
 #include <studcontrolwindow.h>
 #include <subjectcontrolwindow.h>
 #include <questioncontrol.h>
+#include <examcontrol.h>
 namespace Ui {
 class TeacherWindow;
 }
@@ -23,6 +24,8 @@ private slots:
     void on_subjectControl_clicked();
 
     void on_pushButton_clicked();
+
+    void on_examControl_clicked();
 
 private:
     Ui::TeacherWindow *ui;

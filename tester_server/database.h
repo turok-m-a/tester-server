@@ -15,6 +15,7 @@
 #include <QDataStream>
 #include <constants.h>
 #include <QChar>
+#include <QDate>
 using namespace std;
 class dataBase
 {
@@ -36,7 +37,8 @@ public:
     QVector<QVector<QString> > getQuestions(int id);
     void removeQuestion(int id);
     void editQuestionSubjects(int questionId,int editOperationType,int subjId);
-    void addQuestion(int type,int subjId,QString question,QString answer,QByteArray advData);
+    void addQuestion(int type,int subjId,QString question,QString answer,QByteArray advData,int difficulty);
+    void addExam(int subject,QDate date,QByteArray questionList);
     QVector<QString> getSubjects();
     int getUserId(QString name);
     bool checkUser(QString userName,QString password);
@@ -50,6 +52,9 @@ public:
     void removeStudent(int id);
     QString textQuestionFormat(QString questionText, int type, QString answer);
     void addOnesToAnswerString(QString & answer);
+    void setExamTime(int time, id);
+    void deleteExam(int id);
+    void startExamForStudent(int studIds, int examId);
 };
 
 #endif // DATABASE_H

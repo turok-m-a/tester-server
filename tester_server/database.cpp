@@ -96,6 +96,39 @@ void dataBase::addOnesToAnswerString(QString &answer)
     }
     answer.chop(1);
 }
+
+void dataBase::setExamTime(int time,id)
+{
+    QSqlQuery query(db);
+    query.prepare("UPDATE exams SET exam_time = ? WHERE exam_id = ?");
+    query.addBindValue(time);
+    query.addBindValue(id);
+    query.exec();
+}
+
+void dataBase::deleteExam(int id)
+{
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM exams WHERE exam_id = ?");
+    query.addBindValue(id);
+    query.exec();
+}
+
+void dataBase::startExamForStudent(int studIds, int examId)
+{
+    QSqlQuery query(db);
+    query.exec("SELECT MAX(exam_pass_id) FROM exam_pass_status");
+    int passId = query.value(0).toInt();
+    passId++;
+    foreach (int studId, studIds) {
+        query.prepare("INSERT INTO exam_pass_status (exam_pass_id,studId,exam_id) VALUES (?,?,?)");
+        query.addBindValue(passId);
+        query.addBindValue(studId);
+        query.addBindValue(examId);
+        query.exec();
+        passId++;
+    }
+}
 QVector<QVector<QString> > dataBase::getQuestions(int id)
 {
     QSqlQuery query(db),subquery(db);
@@ -138,7 +171,9 @@ QVector<QVector<QString> > dataBase::getQuestions(int id)
             questionText = textQuestionFormat(questionText,q_type,"");
             questionText.insert(0,"Для каждого утверждения выбрать одну из групп:");
             questionText.append("\n");
-            QStringList groupNumbers = query.value(5).toString().split(";",QString::SkipEmptyParts);
+            QString groupNumbers = query.value(5).toString();
+            addOnesToAnswerString(groupNumbers);
+            QStringList groupNumbersList = groupNumbers.split(";",QString::SkipEmptyParts);
             int groupNumbersIndex = 0;
             QByteArray advData = query.value(6).toByteArray();
             advData.remove(0,1);//кол-во групп
@@ -151,7 +186,7 @@ QVector<QVector<QString> > dataBase::getQuestions(int id)
             foreach (QChar c, sequenceText) {
                 questionText.append(c);
                 if(c == QChar('\n')){
-                    questionText.append(" -> "+groupNumbers[groupNumbersIndex]+"\n");
+                    questionText.append(" -> "+groupNumbersList[groupNumbersIndex]+"\n");
                     groupNumbersIndex++;
                 }
             }
@@ -214,16 +249,16 @@ void dataBase::editQuestionSubjects(int questionId, int editOperationType, int s
     query.exec(updateQuery);
 }
 
-void dataBase::addQuestion(int type, int subjId, QString question, QString answer, QByteArray advData)
+void dataBase::addQuestion(int type, int subjId, QString question, QString answer, QByteArray advData, int difficulty)
 {
     QSqlQuery query(db);
     query.exec("SELECT MAX(q_id) FROM tester.questions");
     query.next();
     int qId = query.value(0).toInt();
     qId++;
-    QString q("INSERT INTO tester.questions (q_id,q_type,subject_id,q_text,q_answer) VALUES (");
+    QString q("INSERT INTO tester.questions (q_id,q_type,subject_id,q_text,q_answer,difficulty) VALUES (");
     q.append(QString::number(qId)+" , "+QString::number(type)+" , "+QString::number(subjId)+" , ");
-    q.append("'"+question+"' , '"+answer+"' )");
+    q.append("'"+question+"' , '"+answer+" , "+QString::number(difficulty)+"' )");
     query.exec(q);
     if(!advData.isEmpty()){
         query.prepare("UPDATE tester.questions SET q_adv_data = ? WHERE q_id = ?");
@@ -231,6 +266,22 @@ void dataBase::addQuestion(int type, int subjId, QString question, QString answe
         query.addBindValue(qId);
         query.exec();
     }
+}
+
+void dataBase::addExam(int subject, QDate date, QByteArray questionList)
+{
+    QSqlQuery query(db);
+    query.exec("SELECT MAX(exam_id) FROM tester.exams");
+    query.next();
+    int examId = query.value(0).toInt();
+    examId++;
+    query.prepare("INSERT INTO tester.exams (exam_id,subject_id,date,question_list) VALUES (?,?,?,?)");
+    query.addBindValue(examId);
+    query.addBindValue(subject);
+    query.addBindValue(date);
+    query.addBindValue(questionList);
+    query.exec();
+    const QSqlResult * debug = query.result();
 }
 int dataBase::checkAnswer(int id,QVector<int> answers)
 {
@@ -331,7 +382,7 @@ int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_
        cout << "getStudentState found\n";
        exam_id = query.value(1).toInt();
        pass_status = query.value(2).toInt();
-       query.prepare("SELECT subject_id,question_select_type,question_list FROM tester.exams WHERE exam_id = ? ");
+       query.prepare("SELECT subject_id,question_select_type,question_list,exam_time FROM tester.exams WHERE exam_id = ? ");
        query.addBindValue(exam_id);
        query.exec();
        query.next();
@@ -339,6 +390,8 @@ int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_
        question_select_type = query.value(1).toInt();
        question_list = query.value(2).toByteArray();
        int debug = question_list.size();
+       QDateTime time_limit = QDateTime::currentDateTime();
+       query.exec()
        return pass_status;
     }
     return -1;//нет студента в exam_pass_status, препод не добавил допущенного студента

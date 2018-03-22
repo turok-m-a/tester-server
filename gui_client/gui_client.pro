@@ -36,7 +36,8 @@ SOURCES += \
     teacherwindow.cpp \
     studcontrolwindow.cpp \
     subjectcontrolwindow.cpp \
-    questioncontrol.cpp
+    questioncontrol.cpp \
+    examcontrol.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -51,7 +52,8 @@ HEADERS += \
     teacherwindow.h \
     studcontrolwindow.h \
     subjectcontrolwindow.h \
-    questioncontrol.h
+    questioncontrol.h \
+    examcontrol.h
 
 FORMS += \
         mainwindow.ui \
@@ -60,7 +62,8 @@ FORMS += \
     teacherwindow.ui \
     studcontrolwindow.ui \
     subjectcontrolwindow.ui \
-    questioncontrol.ui
+    questioncontrol.ui \
+    examcontrol.ui
 win32: LIBS += -lws2_32
 
 DISTFILES += \

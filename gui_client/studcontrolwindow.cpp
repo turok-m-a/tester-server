@@ -1,11 +1,19 @@
 #include "studcontrolwindow.h"
 #include "ui_studcontrolwindow.h"
 
-StudControlWindow::StudControlWindow(QWidget *parent) :
+StudControlWindow::StudControlWindow(QWidget *parent, bool studentSelectMode_) :
     QDialog(parent),
     ui(new Ui::StudControlWindow)
 {
     ui->setupUi(this);
+    studentSelectMode = studentSelectMode_;
+    if (studentSelectMode) {
+        ui->delete_2->hide();
+        ui->addButton->hide();
+        ui->tableWidget->insertColumn(5);
+    } else{
+        ui->addStudentToExam->hide();
+    }
 }
 
 StudControlWindow::~StudControlWindow()
@@ -69,7 +77,11 @@ void StudControlWindow::on_findButton_clicked()
          ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
          }
      }
-
+     if(studentSelectMode){
+         for (int i=0;i<ui->tableWidget->rowCount();i++){
+            ui->tableWidget->setItem(6,i,new QCheckBox());
+         }
+     }
 }
 
 void StudControlWindow::on_addButton_clicked()
@@ -135,4 +147,13 @@ void StudControlWindow::on_delete_2_clicked()
     stream << id.toInt();
     reply = network.sendQuery(REMOVE_STUDENT,request);
     ui->findButton->click();
+}
+
+void StudControlWindow::on_addStudentToExam_clicked()
+{
+    for (int i=0;i<ui->tableWidget->rowCount();i++){
+        if (qobject_cast<QCheckBox*>(ui->tableWidget->cellWidget(i,6))->isChecked()){
+           selectedStudents->push_back(ui->tableWidget->item(i,6)->text().toInt());
+        }
+    }
 }

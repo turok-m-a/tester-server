@@ -23,13 +23,20 @@ void TeacherWindow::on_studControl_clicked()
 void TeacherWindow::on_subjectControl_clicked()
 {
     SubjectControlWindow * subjectControlWindow = new SubjectControlWindow();
-    subjectControlWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
+    subjectControlWindow->setAttribute(Qt::WA_DeleteOnClose);
     subjectControlWindow->show();
 }
 
 void TeacherWindow::on_pushButton_clicked()
 {
     QuestionControl * questionControl = new QuestionControl();
-    questionControl->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
+    questionControl->setAttribute(Qt::WA_DeleteOnClose);
     questionControl->show();
+}
+
+void TeacherWindow::on_examControl_clicked()
+{
+    ExamControl * examControl = new ExamControl();
+    examControl->setAttribute(Qt::WA_DeleteOnClose);
+    examControl->show();
 }

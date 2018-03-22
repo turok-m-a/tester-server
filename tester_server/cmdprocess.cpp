@@ -2,7 +2,7 @@
 
 CmdProcess::CmdProcess()
 {
-
+    db = dataBase::getInstance();
 }
 
 CmdProcess::CmdProcess(int opCode, SOCKET _sock)
@@ -38,6 +38,15 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
         break;
     case ADD_QUESTION:
         addQuestion();
+        break;
+    case ADD_EXAM:
+        addExam();
+        break;
+    case DELETE_EXAM:
+        deleteExam();
+        break;
+    case SET_EXAM_TIME:
+        setExamTime();
         break;
     default:
         break;
@@ -85,17 +94,89 @@ void CmdProcess::addQuestion()
     recv(sock,byteArray.data(),byteArrayLen,0);
     QDataStream stream(&byteArray, QIODevice::ReadWrite);
 
-    int questionType,subjectId;
+    int questionType,subjectId,difficulty;
     QString questionText,answerText;
     QByteArray advData;
     stream >> questionType >> subjectId >> questionText >> answerText;
     if (questionType == SEQUENCE_QUESTION_TYPE || questionType == MATCH_QUESTION_TYPE){
-        stream >> advData;
+        stream >> advData >> difficulty;
     }
     dataBase & db = dataBase::getInstance();
-    db.addQuestion(questionType,subjectId,questionText,answerText,advData);
+    db.addQuestion(questionType,subjectId,questionText,answerText,advData,difficulty);
     const int replySize = 0;
     send(sock,(char*)&replySize,sizeof(int),0);
+}
+
+void CmdProcess::addExam()
+{
+    int byteArrayLen;
+    QByteArray byteArray,reply;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    int subjectId;
+    QDate date;
+    QByteArray questionList;
+    stream >> subjectId >> date >> questionList;
+    dataBase & db = dataBase::getInstance();
+    db.addExam(subjectId,date,questionList);
+    const int replySize = 0;
+    send(sock,(char*)&replySize,sizeof(int),0);
+}
+
+void CmdProcess::setExamTime()
+{
+    QByteArray request = recvRequest();
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    int time,id;
+    stream >> time >> id;
+    db.setExamTime(time,id);
+    sendReply();
+}
+
+void CmdProcess::deleteExam()
+{
+    QByteArray request = recvRequest();
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    int id;
+    stream >> id;
+    db.deleteExam(id);
+    sendReply();
+}
+
+void CmdProcess::startExamForStudent()
+{
+    QByteArray request = recvRequest();
+    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    int examId,studNum,studId;
+    stream >> studNum >> examId;
+    QVector<int> studIds;
+    for (int i=0;i<studNum;i++){
+        stream >> studId;
+        studIds.push_back(studId);
+    }
+    db.startExamForStudent(studIds,examId);
+    sendReply();
+}
+
+QByteArray CmdProcess::recvRequest()
+{
+    int byteArrayLen;
+    QByteArray byteArray;
+    recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
+    byteArray.resize(byteArrayLen);
+    recv(sock,byteArray.data(),byteArrayLen,0);
+    return byteArray;
+}
+
+void CmdProcess::sendReply(QByteArray reply)
+{
+    const int replySize = reply.size();//длина в байтах
+    send(sock,(char*)&replySize,sizeof(int),0);
+    if (replySize) {
+    send(sock,reply.data(),replySize,0);
+    }
 }
 void CmdProcess::getQuestionList()
 {

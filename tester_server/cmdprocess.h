@@ -21,7 +21,14 @@ private:
     void removeQuestion();
     void editQuestionSubjects();
     void addQuestion();
+    void addExam();
+    void setExamTime();
+    void deleteExam();
+    void startExamForStudent();
+    QByteArray recvRequest();
+    void sendReply(QByteArray reply= QByteArray());
     SOCKET sock;
+    dataBase & db;
 };
 
 #endif // CMDPROCESS_H

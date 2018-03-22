@@ -38,8 +38,14 @@ QuestionControl::QuestionControl(QWidget *parent) :
      subjListIsEmpty = false;
      ui->subjectList->currentIndexChanged(ui->subjectList->currentIndex());
      ui->answersNumber->setValidator(new QIntValidator(2,10,this));
+     ui->answersNumber2->setValidator(new QIntValidator(2,6,this));
+     ui->difficulty->setValidator(new QIntValidator(1,9,this));
      ui->questionEdit->setColumnCount(1);
      ui->questionEdit->setColumnWidth(0,400);
+     ui->chooseExamDate->hide();
+     ui->addExam->hide();
+     ui->calendarWidget->hide();
+
 }
 
 QuestionControl::~QuestionControl()
@@ -126,6 +132,7 @@ void QuestionControl::on_addQuestion_clicked()
 {
     ui->tableWidget->hide();
     ui->groupBox->show();
+    ui->questionType->currentIndexChanged(0);
 }
 
 void QuestionControl::on_finishQustionAdd_clicked()
@@ -162,9 +169,24 @@ void QuestionControl::on_finishQustionAdd_clicked()
        }
        answer.chop(1);
     }
+    if (index+1 == MATCH_QUESTION_TYPE){
+       advData.append((byte)(ui->questionEdit->rowCount()-1));
+       for (int i=1;i<ui->questionEdit->rowCount();i++){
+               advData.append(ui->questionEdit->item(i,0)->text());
+               advData.append('\0');
+               QString answerNum = QString::number(ui->questionEdit->item(i,1)->text().toInt() - 1);
+               answer.append(answerNum+";");
+       }
+       for (int i=0;i<ui->groups->rowCount();i++){
+               questionText.append(" $"+QString::number(i+1)
+                                   +ui->groups->item(i,0)->text());;
+       }
+       answer.chop(1);
+    }
     QDataStream stream(&request, QIODevice::WriteOnly);
     stream << index+1 << subjectId[ui->subjectList->currentIndex()]
            << questionText << answer;
+    stream << ui->difficulty->text().toInt();
     if (!advData.isEmpty()){
         stream << advData;
     }
@@ -177,10 +199,16 @@ void QuestionControl::on_finishQustionAdd_clicked()
 
 void QuestionControl::on_questionType_currentIndexChanged(int index)
 {
+    ui->answersNumber->show();
+    ui->label_2->show();
+    ui->label_3->hide();
+    ui->answersNumber2->hide();
+    ui->groups->hide();
     if (index+1 == SELECT_QUESTION_TYPE){
-        ui->answersNumber->show();
-        ui->label_2->show();
+        ui->label_2->setText("Вариантов ответа:");
+        ui->questionEdit->setRowCount(0);
         ui->questionEdit->setRowCount(3);
+        ui->questionEdit->setColumnCount(0);//очистить содержимое
         ui->questionEdit->setColumnCount(2);
         ui->questionEdit->setItem(0,0,new QTableWidgetItem("Вводите текст вопроса здесь"));
         ui->questionEdit->setItem(1,0,new QTableWidgetItem("Вариант ответа 1"));
@@ -194,7 +222,9 @@ void QuestionControl::on_questionType_currentIndexChanged(int index)
     if (index+1 == INPUT_QUESTION_TYPE){
         ui->answersNumber->hide();
         ui->label_2->hide();
+        ui->questionEdit->setRowCount(0);
         ui->questionEdit->setRowCount(2);
+        ui->questionEdit->setColumnCount(0);//очистить содержимое
         ui->questionEdit->setColumnCount(1);
         ui->questionEdit->setItem(0,0,new QTableWidgetItem("Вводите текст вопроса здесь"));
         ui->questionEdit->setItem(1,0,new QTableWidgetItem("текст ответа"));
@@ -202,9 +232,10 @@ void QuestionControl::on_questionType_currentIndexChanged(int index)
         ui->answersNumber->setText("2");
     }
     if (index+1 == SEQUENCE_QUESTION_TYPE){
-        ui->answersNumber->show();
-        ui->label_2->show();
+        ui->label_2->setText("Этапов:");
+        ui->questionEdit->setRowCount(0);
         ui->questionEdit->setRowCount(2);
+        ui->questionEdit->setColumnCount(0);//очистить содержимое
         ui->questionEdit->setColumnCount(2);
         ui->questionEdit->setItem(0,0,new QTableWidgetItem("Вводите текст вопроса здесь"));
         ui->questionEdit->setItem(0,1,new QTableWidgetItem("порядков ответов в вопросе"));
@@ -213,6 +244,25 @@ void QuestionControl::on_questionType_currentIndexChanged(int index)
         ui->questionEdit->setRowHeight(0,100);
         ui->answersNumber->setText("1");
     }
+    if (index+1 == MATCH_QUESTION_TYPE){
+        ui->questionEdit->clearContents();
+        ui->label_2->setText("Кол-во ответов:");
+        ui->label_3->setText("Групп:");
+        ui->label_3->show();
+        ui->groups->show();
+        ui->answersNumber2->show();
+        ui->questionEdit->setColumnCount(0);//очистить содержимое
+        ui->questionEdit->setColumnCount(2);
+        ui->questionEdit->setRowCount(0);
+        ui->questionEdit->setRowCount(2);
+        ui->questionEdit->setItem(0,0,new QTableWidgetItem("Ответы для группировки:"));
+        ui->questionEdit->setItem(0,1,new QTableWidgetItem("Номера групп:"));
+        ui->questionEdit->setItem(1,0,new QTableWidgetItem("элемент первой группы"));
+        ui->questionEdit->setItem(1,1,new QTableWidgetItem("1"));
+        ui->groups->setItem(0,0,new QTableWidgetItem("Группа 1"));
+        ui->answersNumber->setText("1");
+    }
+    ui->questionEdit->setColumnWidth(0,400);
 }
 
 
@@ -225,8 +275,6 @@ void QuestionControl::on_answersNumber_editingFinished()
     for (int i=oldRowCount;i<newRowCount;i++){
         if (ui->questionType->currentIndex() +1 == SELECT_QUESTION_TYPE){
             ui->questionEdit->setCellWidget(i,1,new QCheckBox());
-        } else {
-            ui->questionEdit->setItem(i,0,new QTableWidgetItem());
         }
         ui->questionEdit->setItem(i,0,new QTableWidgetItem());
     }
@@ -240,4 +288,53 @@ void QuestionControl::formatQuestionText(QString &text)
             i++;
         }
     }
+}
+
+void QuestionControl::on_answersNumber2_editingFinished()
+{
+    int newRowCount = ui->answersNumber2->text().toInt();
+    int oldRowCount = ui->groups->rowCount();
+    ui->groups->setRowCount(newRowCount);
+    for (int i=oldRowCount;i<newRowCount;i++){
+        ui->groups->setItem(i,0,new QTableWidgetItem());
+    }
+}
+
+void QuestionControl::on_groups_itemChanged(QTableWidgetItem *item)
+{
+    ui->groups->resizeRowsToContents();
+}
+
+void QuestionControl::on_questionEdit_itemChanged(QTableWidgetItem *item)
+{
+    ui->questionEdit->resizeRowsToContents();
+}
+
+void QuestionControl::on_pushButton_3_clicked()
+{
+    ui->calendarWidget->show();
+    ui->chooseExamDate->show();
+    ui->addExam->show();
+}
+
+void QuestionControl::on_addExam_clicked()
+{
+    const int currentSubjId = subjectId[ui->subjectList->currentIndex()];
+    QByteArray request,questionList;
+    QDataStream stream(&request, QIODevice::WriteOnly);
+    stream << currentSubjId;
+    QDataStream qStream(&questionList, QIODevice::WriteOnly);
+    qStream.setByteOrder(QDataStream::LittleEndian);
+    for (int i=0;i<ui->tableWidget->rowCount();i++){
+        if(qobject_cast<QCheckBox*>(ui->tableWidget->cellWidget(i,5))->isChecked()){
+            int qId = ui->tableWidget->item(i,3)->text().toInt();
+            qStream << qId;
+        }
+    }
+    QDate date = ui->calendarWidget->selectedDate();
+    //QString dateStr = date.toString(Qt::ISODate);
+    stream << date;
+    stream << questionList;
+    Network & network = Network::getInstance();
+    network.sendQuery(ADD_EXAM,request);
 }

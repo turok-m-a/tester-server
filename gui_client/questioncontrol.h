@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <network.h>
 #include <qcheckbox.h>
+#include <QTableWidgetItem>
 namespace Ui {
 class QuestionControl;
 }
@@ -31,9 +32,17 @@ private slots:
 
     void on_questionType_currentIndexChanged(int index);
 
-    void on_lineEdit_editingFinished();
-
     void on_answersNumber_editingFinished();
+
+    void on_answersNumber2_editingFinished();
+
+    void on_groups_itemChanged(QTableWidgetItem *item);
+
+    void on_questionEdit_itemChanged(QTableWidgetItem *item);
+
+    void on_pushButton_3_clicked();
+
+    void on_addExam_clicked();
 
 private:
     Ui::QuestionControl *ui;
