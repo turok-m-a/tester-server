@@ -2,7 +2,6 @@
 
 CmdProcess::CmdProcess()
 {
-    db = dataBase::getInstance();
 }
 
 CmdProcess::CmdProcess(int opCode, SOCKET _sock)
@@ -47,6 +46,15 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
         break;
     case SET_EXAM_TIME:
         setExamTime();
+        break;
+    case GET_EXAM_LIST:
+        getExamList();
+        break;
+    case GET_PASS_STATE:
+        getStudPassStatus();
+        break;
+    case START_EXAM_FOR_STUDENT:
+        startExamForStudent();
         break;
     default:
         break;
@@ -128,19 +136,32 @@ void CmdProcess::addExam()
 void CmdProcess::setExamTime()
 {
     QByteArray request = recvRequest();
-    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    QDataStream stream(&request, QIODevice::ReadWrite);
     int time,id;
     stream >> time >> id;
-    db.setExamTime(time,id);
+    dataBase & db = dataBase::getInstance();
+    bool alreadySet;
+    db.setExamTime(time,id,alreadySet);
+    QVector<QVector<QString>> status;
+    if(alreadySet){
+        dataBase & db = dataBase::getInstance();
+        status = db.getExamStudList(id);
+        QByteArray reply;
+        QDataStream replyStream(&reply, QIODevice::ReadWrite);
+        replyStream << status;
+        sendReply(reply);
+        return;
+    }
     sendReply();
 }
 
 void CmdProcess::deleteExam()
 {
     QByteArray request = recvRequest();
-    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    QDataStream stream(&request, QIODevice::ReadWrite);
     int id;
     stream >> id;
+    dataBase & db = dataBase::getInstance();
     db.deleteExam(id);
     sendReply();
 }
@@ -148,16 +169,35 @@ void CmdProcess::deleteExam()
 void CmdProcess::startExamForStudent()
 {
     QByteArray request = recvRequest();
-    QDataStream stream(&byteArray, QIODevice::ReadWrite);
+    QDataStream stream(&request, QIODevice::ReadWrite);
     int examId,studNum,studId;
     stream >> studNum >> examId;
-    QVector<int> studIds;
+    QVector<int> studIds,passIds;
     for (int i=0;i<studNum;i++){
         stream >> studId;
         studIds.push_back(studId);
     }
-    db.startExamForStudent(studIds,examId);
-    sendReply();
+    dataBase & db = dataBase::getInstance();
+    db.startExamForStudent(studIds,examId,passIds);
+    QByteArray reply;
+    QDataStream replyStream(&reply, QIODevice::ReadWrite);
+    replyStream << passIds;
+    sendReply(reply);
+}
+
+void CmdProcess::getExamList()
+{
+    QByteArray request = recvRequest();
+    QByteArray reply;
+    QDataStream stream(&request, QIODevice::ReadWrite);
+    QDataStream replyStream(&reply, QIODevice::ReadWrite);
+    int subjId;
+    stream >> subjId;
+    QVector<QVector<QString>> exams;
+    dataBase & db = dataBase::getInstance();
+    exams = db.getExamList(subjId);
+    replyStream << exams;
+    sendReply(reply);
 }
 
 QByteArray CmdProcess::recvRequest()
@@ -177,6 +217,21 @@ void CmdProcess::sendReply(QByteArray reply)
     if (replySize) {
     send(sock,reply.data(),replySize,0);
     }
+}
+
+void CmdProcess::getStudPassStatus()
+{
+    QByteArray request = recvRequest();
+    QDataStream stream(&request, QIODevice::ReadWrite);
+    QVector<int> passId;
+    QVector<float> status;
+    stream >> passId;
+    dataBase & db = dataBase::getInstance();
+    status = db.getStudentPassStatus(passId);
+    QByteArray reply;
+    QDataStream replyStream(&reply, QIODevice::ReadWrite);
+    replyStream << status;
+    sendReply(reply);
 }
 void CmdProcess::getQuestionList()
 {

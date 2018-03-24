@@ -10,7 +10,7 @@ StudControlWindow::StudControlWindow(QWidget *parent, bool studentSelectMode_) :
     if (studentSelectMode) {
         ui->delete_2->hide();
         ui->addButton->hide();
-        ui->tableWidget->insertColumn(5);
+        ui->tableWidget->insertColumn(6);
     } else{
         ui->addStudentToExam->hide();
     }
@@ -79,7 +79,7 @@ void StudControlWindow::on_findButton_clicked()
      }
      if(studentSelectMode){
          for (int i=0;i<ui->tableWidget->rowCount();i++){
-            ui->tableWidget->setItem(6,i,new QCheckBox());
+            ui->tableWidget->setCellWidget(i,6,new QCheckBox());
          }
      }
 }
@@ -153,7 +153,10 @@ void StudControlWindow::on_addStudentToExam_clicked()
 {
     for (int i=0;i<ui->tableWidget->rowCount();i++){
         if (qobject_cast<QCheckBox*>(ui->tableWidget->cellWidget(i,6))->isChecked()){
-           selectedStudents->push_back(ui->tableWidget->item(i,6)->text().toInt());
+           selectedStudents->push_back(ui->tableWidget->item(i,5)->text().toInt());
+           selectedStudentsNames->push_back(ui->tableWidget->item(i,0)->text() + " " +
+                                            ui->tableWidget->item(i,1)->text());
         }
     }
+    emit(studentsAdded());
 }

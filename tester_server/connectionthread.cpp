@@ -107,8 +107,10 @@ void connectionThread::processStudentAnswers()
     }
     float decimalMark = round ((float)testMark / (float)maxMark * 100);
     decimalMark /= 10;
+    if (db.timeLimitExceed(userId)) decimalMark = 0.0;
     std::cout <<"testmark " <<testMark ;
     send(sockDescriptor,(char*)&decimalMark,sizeof(float),0);
+    db.setStudentMark(userId,decimalMark);
     closesocket(sockDescriptor);
 }
 

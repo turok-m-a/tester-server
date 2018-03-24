@@ -25,10 +25,11 @@ private:
     void setExamTime();
     void deleteExam();
     void startExamForStudent();
+    void getExamList();
     QByteArray recvRequest();
     void sendReply(QByteArray reply= QByteArray());
+    void getStudPassStatus();
     SOCKET sock;
-    dataBase & db;
 };
 
 #endif // CMDPROCESS_H

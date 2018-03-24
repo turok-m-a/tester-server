@@ -7,16 +7,7 @@ dataBase::dataBase()
     db.setDatabaseName("tester");
     db.setUserName("tester");
     db.setPassword("12345");
-     // cout << db.lastError().number()<<endl;
     bool ok = db.open();
-//    QSqlQuery query(db);
-//    query.exec("SELECT * FROM subjects");
-//    while (query.next()) {
-//         QString name = QString::fromUtf8(query.value(0).toByteArray());
-//         int salary = query.value(1).toInt();
-//         string a = name.toStdString();
-//         cout <<a << salary;
-//       }
 }
 
 
@@ -97,13 +88,22 @@ void dataBase::addOnesToAnswerString(QString &answer)
     answer.chop(1);
 }
 
-void dataBase::setExamTime(int time,id)
+void dataBase::setExamTime(int time, int id,bool & alreadySet)
 {
     QSqlQuery query(db);
+    query.prepare("SELECT exam_time FROM exams WHERE exam_id = ?");
+    query.addBindValue(id);
+    query.exec();
+    query.next();
+    if (!query.value(0).isNull()){
+        alreadySet = true;
+        return;
+    }
     query.prepare("UPDATE exams SET exam_time = ? WHERE exam_id = ?");
     query.addBindValue(time);
     query.addBindValue(id);
     query.exec();
+    alreadySet = false;
 }
 
 void dataBase::deleteExam(int id)
@@ -114,20 +114,103 @@ void dataBase::deleteExam(int id)
     query.exec();
 }
 
-void dataBase::startExamForStudent(int studIds, int examId)
+void dataBase::startExamForStudent(QVector<int> studIds, int examId, QVector<int> &passIds)
 {
     QSqlQuery query(db);
     query.exec("SELECT MAX(exam_pass_id) FROM exam_pass_status");
+    query.next();
     int passId = query.value(0).toInt();
     passId++;
     foreach (int studId, studIds) {
-        query.prepare("INSERT INTO exam_pass_status (exam_pass_id,studId,exam_id) VALUES (?,?,?)");
+        query.prepare("INSERT INTO exam_pass_status (exam_pass_id,stud_id,exam_id,pass_status) VALUES (?,?,?,11.0)");
         query.addBindValue(passId);
         query.addBindValue(studId);
         query.addBindValue(examId);
         query.exec();
+        passIds.push_back(passId);
         passId++;
     }
+}
+
+bool dataBase::timeLimitExceed(int studId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT time_limit FROM exam_pass_status WHERE pass_status = 11 AND stud_id = ?");
+    query.addBindValue(studId);
+    query.exec();
+    query.next();
+    QDateTime current = QDateTime::currentDateTime();
+    if (current > query.value(0).toDateTime()){
+        return true;
+    }
+    return false;
+}
+
+QVector<QVector<QString> > dataBase::getExamList(int subjId)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT exam_id,date FROM exams WHERE subject_id = ?");
+    query.addBindValue(subjId);
+    query.exec();
+    QVector<QVector<QString>> exams;
+    while (query.next()){
+        QVector<QString> exam;
+        exam.push_back(query.value(0).toString());
+        exam.push_back(query.value(1).toString());
+        exams.push_back(exam);
+    }
+    return exams;
+}
+
+QVector<float> dataBase::getStudentPassStatus(QVector<int> passIds, int examId)
+{
+    QSqlQuery query(db);
+    QVector<float> state;
+
+    foreach (int id, passIds) {
+        query.prepare("SELECT pass_status FROM exam_pass_status WHERE exam_pass_id = ?");
+        query.addBindValue(id);
+        query.exec();
+        query.next();
+        state.push_back(query.value(0).toFloat());
+    }
+    return state;
+}
+
+void dataBase::setStudentMark(int studId, float mark)
+{
+    QSqlQuery query(db);
+    query.prepare("UPDATE exam_pass_status SET pass_status = ? WHERE stud_id = ? AND pass_status = 11");
+    query.addBindValue(mark);
+    query.addBindValue(studId);
+    query.exec();
+}
+
+QVector<QVector<QString> > dataBase::getExamStudList(int examId)
+{
+    QSqlQuery query(db);
+    QVector<QVector<QString>> studList;
+    QVector<int> passIds;
+    QVector<int> studIds;
+        query.prepare("SELECT exam_pass_id,stud_id FROM exam_pass_status WHERE exam_id = ?");
+        query.addBindValue(examId);
+        query.exec();
+        while(query.next()){
+            passIds.push_back(query.value(0).toInt());
+            studIds.push_back(query.value(1).toInt());
+        }
+        for (int i=0;i<studIds.size();i++) {
+            QVector<QString> status;
+            query.prepare("SELECT last_name,first_name FROM students WHERE stud_id = ?");
+            query.addBindValue(studIds[i]);
+            query.exec();
+            query.next();
+            status.push_back(query.value(0).toString()+" "+query.value(1).toString());
+            status.push_back(QString::number(passIds[i]));
+            status.push_back(QString::number(studIds[i]));
+            studList.push_back(status);
+        }
+        return studList;
 }
 QVector<QVector<QString> > dataBase::getQuestions(int id)
 {
@@ -372,7 +455,7 @@ int dataBase::checkAnswer(int id, QString answer)
 int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_select_type, QByteArray &question_list, int &exam_id)
 {
     QSqlQuery query(db);
-    query.prepare("SELECT stud_id,exam_id,pass_status FROM tester.exam_pass_status WHERE stud_id = ?");
+    query.prepare("SELECT stud_id,exam_id,pass_status FROM tester.exam_pass_status WHERE stud_id = ? AND pass_status = 11");
     //ищем строку с статусом экзамена, к которому в данный момент получен допуск (такой должен быть 1 т.к.
     //препод добавляет студента когда тот приходит на экзамен)
     query.addBindValue(id);
@@ -389,12 +472,18 @@ int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_
        subject_id = query.value(0).toInt();
        question_select_type = query.value(1).toInt();
        question_list = query.value(2).toByteArray();
-       int debug = question_list.size();
        QDateTime time_limit = QDateTime::currentDateTime();
-       query.exec()
+       qint64 seconds = query.value(3).toInt();
+       time_limit = time_limit.addSecs(seconds);
+       query.prepare("UPDATE exam_pass_status SET time_limit = ? WHERE stud_id = ?");
+       query.addBindValue(time_limit);
+       query.addBindValue(id);
+       query.exec();
        return pass_status;
+    } else {
+        return -1; //нет прохождения экзамена в exam_pass_status, в котором есть допуск
     }
-    return -1;//нет студента в exam_pass_status, препод не добавил допущенного студента
+    return -1;
 }
 
 int dataBase::getMaxMark(int id)

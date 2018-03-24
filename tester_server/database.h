@@ -26,7 +26,6 @@ private:
     dataBase& operator=(dataBase& );
     QSqlDatabase db;
 public:
-   //dataBase();
     static dataBase& getInstance() {
            static dataBase  instance;
            return instance;
@@ -52,9 +51,14 @@ public:
     void removeStudent(int id);
     QString textQuestionFormat(QString questionText, int type, QString answer);
     void addOnesToAnswerString(QString & answer);
-    void setExamTime(int time, id);
+    void setExamTime(int time, int id, bool &alreadySet);
     void deleteExam(int id);
-    void startExamForStudent(int studIds, int examId);
+    void startExamForStudent(QVector<int> studIds, int examId,QVector<int> & passIds);
+    bool timeLimitExceed(int studId);
+    QVector<QVector <QString>> getExamList(int subjId);
+    QVector<float> getStudentPassStatus(QVector<int> passIds,int examId = -1);
+    void setStudentMark(int studId,float mark);
+    QVector<QVector <QString>> getExamStudList(int examId);
 };
 
 #endif // DATABASE_H

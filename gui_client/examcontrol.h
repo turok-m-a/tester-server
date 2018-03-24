@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <network.h>
 #include <studcontrolwindow.h>
+#include <QTimer>
 namespace Ui {
 class ExamControl;
 }
@@ -19,7 +20,6 @@ public:
 private slots:
     void on_addStudToExam_clicked();
 
-    void on_pushButton_clicked();
 
     void on_selectExam_clicked();
 
@@ -27,14 +27,21 @@ private slots:
 
     void on_subjList_currentIndexChanged(int index);
 
+    void updateStudList();
+    void addStudToExam();
+    void on_viewExamHistory_clicked();
+
 private:
+    QTimer * studentListUpdateTimer;
     Ui::ExamControl *ui;
     QVector<int> subjectId;
     QVector<int> studIds;
+    QVector<QString> studNames;
     int selectedExamId;
     int examTime;
     bool subjListIsEmpty;
-    void addStudToExam();
+    QVector<QString> addedStudentsNames;
+    QVector<int> addedStudentsIds;
 };
 
 #endif // EXAMCONTROL_H

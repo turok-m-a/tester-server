@@ -29,7 +29,7 @@
     <enum>QAbstractItemView::SelectRows</enum>
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
-    <number>250</number>
+    <number>160</number>
    </attribute>
    <column>
     <property name="text">
@@ -94,7 +94,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Начать экзамен</string>
+    <string>Начать/продолжить экзамен</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
