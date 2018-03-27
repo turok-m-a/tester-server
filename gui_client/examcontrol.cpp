@@ -5,6 +5,7 @@ ExamControl::ExamControl(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ExamControl)
 {
+    studListView = false;
     studentListUpdateTimer = 0;
     subjListIsEmpty = true;
     ui->setupUi(this);
@@ -26,6 +27,10 @@ ExamControl::ExamControl(QWidget *parent) :
     }
     //ui->examList->setColumnWidth(1,0);
     subjListIsEmpty = false;
+    if(ui->subjList->count()){
+        ui->subjList->currentIndexChanged(0);
+    }
+    ui->viewReport->hide();
 }
 
 ExamControl::~ExamControl()
@@ -48,9 +53,11 @@ void ExamControl::on_addStudToExam_clicked()
 
 void ExamControl::on_selectExam_clicked()
 {
+
+    studListView = true;
     int selectedRow = ui->examList->selectedItems().first()->row();
     selectedExamId = ui->examList->item(selectedRow,0)->text().toInt();
-    examTime = ui->examTime->text().toInt() * 60;//время укзамена в секундах
+    examTime = ui->examTime->text().toInt() * 60;//время экзамена в секундах
     QByteArray byteArray,reply;
     Network & network = Network::getInstance();
      QDataStream stream(&byteArray, QIODevice::WriteOnly);
@@ -82,6 +89,8 @@ void ExamControl::on_selectExam_clicked()
     studentListUpdateTimer = new QTimer(this);
     connect(studentListUpdateTimer,SIGNAL(timeout()),this,SLOT(updateStudList()));
     studentListUpdateTimer->start(5000);
+    ui->delExam->hide();
+
 }
 void ExamControl::on_viewExamHistory_clicked()
 {
@@ -91,7 +100,26 @@ void ExamControl::on_viewExamHistory_clicked()
 }
 void ExamControl::on_examList_itemSelectionChanged()
 {
+     if (studListView) return;
     ui->selectExam->setEnabled(true);
+    if (ui->examList->selectedItems().isEmpty()) return;
+    int selectedRow = ui->examList->selectedItems().first()->row();
+    QString examDate = ui->examList->item(selectedRow,1)->text();
+    QDate date = QDate::fromString(examDate,"yyyy-MM-dd");
+    QDate currentDate = QDate::currentDate();
+    if(currentDate > date){
+        ui->selectExam->setText("Просмотреть результаты");
+        ui->addStudToExam->setEnabled(false);
+        ui->examTime->setEnabled(false);
+        ui->addStudToExam->setEnabled(false);
+        ui->viewReport->show();
+    } else {
+        ui->selectExam->setText("Начать/продолжить экзамен");
+        ui->addStudToExam->setEnabled(true);
+        ui->examTime->setEnabled(true);
+        ui->addStudToExam->setEnabled(true);
+        ui->viewReport->hide();
+    }
 }
 
 void ExamControl::on_subjList_currentIndexChanged(int index)
@@ -169,3 +197,15 @@ void ExamControl::addStudToExam()
 }
 
 
+
+void ExamControl::on_viewReport_clicked()
+{
+    if (ui->examList->selectedItems().isEmpty()) return;
+    int selectedRow = ui->examList->selectedItems().first()->row();
+    if(studListView){
+        QString debug = ui->examList->item(selectedRow,2)->text();
+        ReportView * view = new ReportView(ui->examList->item(selectedRow,2)->text(),this);
+        view->setAttribute(Qt::WA_DeleteOnClose);
+        view->show();
+    }
+}

@@ -56,6 +56,9 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
     case START_EXAM_FOR_STUDENT:
         startExamForStudent();
         break;
+    case VIEW_REPORT:
+        viewReport();
+        break;
     default:
         break;
     }
@@ -231,6 +234,20 @@ void CmdProcess::getStudPassStatus()
     QByteArray reply;
     QDataStream replyStream(&reply, QIODevice::ReadWrite);
     replyStream << status;
+    sendReply(reply);
+}
+
+void CmdProcess::viewReport()
+{
+    QByteArray request = recvRequest();
+    QDataStream stream(&request, QIODevice::ReadWrite);
+    QString id,report;
+    stream >> id;
+    dataBase & db = dataBase::getInstance();
+    report = db.getReport(id.toInt());
+    QByteArray reply;
+    QDataStream replyStream(&reply, QIODevice::ReadWrite);
+    replyStream << report;
     sendReply(reply);
 }
 void CmdProcess::getQuestionList()

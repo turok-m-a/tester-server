@@ -33,12 +33,12 @@
    </attribute>
    <column>
     <property name="text">
-     <string>Дата проведения</string>
+     <string>ID</string>
     </property>
    </column>
    <column>
     <property name="text">
-     <string>ID</string>
+     <string>Дата проведения</string>
     </property>
    </column>
   </widget>
@@ -121,6 +121,19 @@
    </property>
    <property name="text">
     <string>45</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="viewReport">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>190</y>
+     <width>191</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Просмотреть отчет</string>
    </property>
   </widget>
  </widget>

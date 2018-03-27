@@ -30,6 +30,8 @@ void connectionThread::processStudent()
     }
     if (select_type == 1) { //список вопросов заранее задан
         question_list = db.getQuestionsForExam(question_list); //получаем сами вопросы для передачи на клиент.
+        int examTime = db.getExamTime(exam_id);
+        question_list.append((char*)&examTime,sizeof(int));
         int size = question_list.size();
         send(sockDescriptor,(char*)&size,sizeof(int),0);
         send(sockDescriptor,question_list.constData(),size,0);
@@ -83,6 +85,7 @@ void connectionThread::processStudentAnswers()
             answers.push_back(answer);
         }
         testMark += db.checkAnswer(id,answers);
+        db.addTextNote(answers,id,userId);
     }
     if (type == 2){
         int textLen;
@@ -91,6 +94,7 @@ void connectionThread::processStudentAnswers()
         recv(sockDescriptor,utf8string,textLen,0);
         QString answer = QString::fromUtf8(utf8string,textLen);
         testMark += db.checkAnswer(id,answer);
+        db.addTextNote(answer,id,userId);
     }
     if (type == 3 || type == 4){
         int number;
@@ -103,6 +107,7 @@ void connectionThread::processStudentAnswers()
             answers.push_back(answer);
         }
         testMark += db.checkAnswer(id,answers);
+        db.addTextNote(answers,id,userId);
     }
     }
     float decimalMark = round ((float)testMark / (float)maxMark * 100);

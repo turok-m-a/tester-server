@@ -11,12 +11,35 @@ void TestWindow::showWindow()
     this->show();
     showQuestion(0);
     ui->imageLabel->hide();
+
 }
 
-void TestWindow::setQuestions(QVector<Question> _questions)
+void TestWindow::setQuestions(QVector<Question> _questions,int examTime_)
 {
+    examTime = examTime_;
     questions = _questions;
     currentQuestion = 0;
+    timer = new QTimer(this);
+    connect(timer,SIGNAL(timeout()),this,SLOT(timerUpdate()));
+    timer->start(1000);
+    remainingTime.setHMS(0,0,0);
+    remainingTime = remainingTime.addSecs(examTime_ - 5);
+    ui->timer->setText(remainingTime.toString());
+}
+
+TestWindow::~TestWindow()
+{
+    delete timer;
+}
+
+void TestWindow::timerUpdate()
+{
+    remainingTime = remainingTime.addSecs(-1);
+    ui->timer->setText(remainingTime.toString());
+    if (remainingTime == QTime(0,0,0)){
+        timer->stop();
+        on_submitButton_clicked();
+    }
 }
 
 void TestWindow::on_nextButton_clicked()

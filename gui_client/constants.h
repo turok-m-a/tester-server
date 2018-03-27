@@ -36,4 +36,5 @@
 #define DELETE_EXAM 25
 #define SET_EXAM_TIME 26
 #define GET_PASS_STATE 27
+#define VIEW_REPORT 28
 #endif // CONNECTIONERROR_H

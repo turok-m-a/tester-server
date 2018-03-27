@@ -68,19 +68,6 @@
     <string>Управление экзаменами</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>130</y>
-     <width>171</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Просмотр истории экзаменов</string>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>

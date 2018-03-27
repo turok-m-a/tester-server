@@ -15,11 +15,12 @@ private:
     QString serverAddress;
     QString login;
     QString password;
+    int examTime;
 public:
     void setAddress(QString address);
     int currentUserType;
     QString studLogin;
-
+    int getExamTime();
     void setUser(QString _login,QString _password);
     int checkUser();
     QByteArray sendQuery(int opCode,QByteArray query);

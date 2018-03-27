@@ -11,6 +11,11 @@ void Network::setAddress(QString address)
     serverAddress = address;
 }
 
+int Network::getExamTime()
+{
+    return examTime;
+}
+
 void Network::setUser(QString _login, QString _password)
 {
     login = _login;
@@ -173,7 +178,8 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
         questions+=adv_len;
         }
     }
-    QString del = questionsContainer[0].getQuestionText();//debug
+    //questions+=4;
+    examTime = *((int*)questions);
     delete questionBuf;
     return questionsContainer;
 }

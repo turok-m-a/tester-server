@@ -11,6 +11,8 @@
 #include <infowindow.h>
 #include <sequencequestiondrawer.h>
 #include <groupquestiondrawer.h>
+#include <qtimer.h>
+#include <QTime>
 namespace  Ui {
     class TestWindow;
 }
@@ -21,14 +23,16 @@ class TestWindow : public QDialog
 public:
     explicit TestWindow(QWidget *parent = 0);
     void showWindow();
-    void setQuestions(QVector<Question> _questions);
+    void setQuestions(QVector<Question> _questions, int examTime_ = 3600);
+    ~TestWindow();
+public slots:
+    void timerUpdate();
 private slots:
     void on_nextButton_clicked();
 
     void on_prevButton_clicked();
 
     void on_submitButton_clicked();
-
 private:
     Ui::TestWindow * ui;
     QVector<Question> questions;
@@ -41,6 +45,9 @@ private:
     QGraphicsScene * scene;
     SequenceQuestionDrawer * drawer;
     GroupQuestionDrawer * gDrawer;
+    QTimer * timer;
+    int examTime;
+    QTime remainingTime;
 };
 
 #endif // TESTWINDOW_H

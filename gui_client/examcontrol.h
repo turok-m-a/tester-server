@@ -5,6 +5,8 @@
 #include <network.h>
 #include <studcontrolwindow.h>
 #include <QTimer>
+#include <QDate>
+#include <reportview.h>
 namespace Ui {
 class ExamControl;
 }
@@ -31,6 +33,8 @@ private slots:
     void addStudToExam();
     void on_viewExamHistory_clicked();
 
+    void on_viewReport_clicked();
+
 private:
     QTimer * studentListUpdateTimer;
     Ui::ExamControl *ui;
@@ -42,6 +46,7 @@ private:
     bool subjListIsEmpty;
     QVector<QString> addedStudentsNames;
     QVector<int> addedStudentsIds;
+    bool studListView;
 };
 
 #endif // EXAMCONTROL_H

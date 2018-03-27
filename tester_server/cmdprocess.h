@@ -29,6 +29,7 @@ private:
     QByteArray recvRequest();
     void sendReply(QByteArray reply= QByteArray());
     void getStudPassStatus();
+    void viewReport();
     SOCKET sock;
 };
 

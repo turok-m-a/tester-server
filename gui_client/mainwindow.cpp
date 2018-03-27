@@ -54,7 +54,7 @@ void MainWindow::studLogin()
     network.currentUserType = 1;
     testWindow = new TestWindow();
     testWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
-    testWindow->setQuestions(questions);
+    testWindow->setQuestions(questions,network.getExamTime());
     testWindow->showWindow();
     }
 }
@@ -70,7 +70,7 @@ void MainWindow::teacherLogin()
         infoWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
         switch (loginStatus) {
         case CONN_NOT_FOUND:
-            infoWindow->setMessage("Неправильный номер ст. билета либо нет допуска к экзамену");
+            infoWindow->setMessage("Неправильный логин/пароль");
             break;
         case CONN_ERROR:
             infoWindow->setMessage("Нет соединеия с сервером");

@@ -212,7 +212,76 @@ QVector<QVector<QString> > dataBase::getExamStudList(int examId)
         }
         return studList;
 }
-QVector<QVector<QString> > dataBase::getQuestions(int id)
+
+int dataBase::getExamTime(int exam_id)
+{
+     QSqlQuery query(db);
+     query.prepare("SELECT exam_time FROM exams WHERE exam_id = ?");
+     query.addBindValue(exam_id);
+     query.exec();
+     query.next();
+     return query.value(0).toInt();
+}
+
+void dataBase::addTextNote(QString studAnswer, int id, int studId)
+{
+    QString q;
+    QSqlQuery checkIfNull(db);
+    checkIfNull.exec("SELECT text_note FROM exam_pass_status WHERE stud_id = "+QString::number(studId)+" AND pass_status = 11");
+    checkIfNull.next();
+    if (checkIfNull.value(0).isNull()){
+        q = "UPDATE exam_pass_status SET text_note = \"";
+    } else {
+        q = "UPDATE exam_pass_status SET text_note = CONCAT(text_note,\"";
+    }
+    QVector<QVector<QString>> questions = getQuestions(-1,id); //тип, вопрос,...,id,diff,ответ
+    q.append("\n"+questions[0][1]);
+    q.append("\nответ студента:\n"+studAnswer+"\n\"");
+    if (!checkIfNull.value(0).isNull()){
+        q.append(")");
+    }
+    q.append("WHERE stud_id = "+QString::number(studId)+" AND pass_status = 11");
+    QSqlQuery query(db);
+    query.exec(q);
+
+}
+
+void dataBase::addTextNote(QVector<int> studAnswers, int id, int studId)
+{
+    QString q;
+    QSqlQuery checkIfNull(db);
+    checkIfNull.exec("SELECT text_note FROM exam_pass_status WHERE stud_id = "+QString::number(studId)+" AND pass_status = 11");
+    checkIfNull.next();
+    if (checkIfNull.value(0).isNull()){
+        q = "UPDATE exam_pass_status SET text_note = \"";
+    } else {
+        q = "UPDATE exam_pass_status SET text_note = CONCAT(text_note,\"";
+    }
+    QVector<QVector<QString>> questions = getQuestions(-1,id); //тип, вопрос,...,id,diff,ответ
+    q.append(questions[0][1]+"\nответ студента\n");
+    QString studAnswer;
+    foreach (int answer, studAnswers) {
+        studAnswer.append(QString::number(answer+1)+" ;");
+    }
+    q.append(studAnswer+"\"");
+    if (!checkIfNull.value(0).isNull()){
+        q.append(")");
+    }
+    q.append("WHERE stud_id = "+QString::number(studId)+" AND pass_status = 11");
+    QSqlQuery query(db);
+    query.exec(q);
+}
+
+QString dataBase::getReport(int id)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT text_note FROM exam_pass_status WHERE exam_pass_id = ?");
+    query.addBindValue(id);
+    query.exec();
+    query.next();
+    return query.value(0).toString();
+}
+QVector<QVector<QString> > dataBase::getQuestions(int id,int questionId)
 {
     QSqlQuery query(db),subquery(db);
     QString idText = QString::number(id);
@@ -220,6 +289,10 @@ QVector<QVector<QString> > dataBase::getQuestions(int id)
     idText.append("%'");
     QString q("SELECT q_type,q_text,subject_id,q_id,difficulty,q_answer,q_adv_data FROM questions WHERE subject_id LIKE (");
     q.append(idText+")");
+    if (questionId != -1){
+        q = "SELECT q_type,q_text,subject_id,q_id,difficulty,q_answer,q_adv_data FROM questions WHERE";
+        q.append(" q_id = "+QString::number(questionId));
+    }
     query.exec(q);
     QVector<QVector<QString> > questions;
     while(query.next()){
@@ -366,7 +439,7 @@ void dataBase::addExam(int subject, QDate date, QByteArray questionList)
     query.exec();
     const QSqlResult * debug = query.result();
 }
-int dataBase::checkAnswer(int id,QVector<int> answers)
+int dataBase::checkAnswer(int id, QVector<int> answers, QString *correctAnswer)
 {
     QSqlQuery query(db);
     query.prepare("SELECT q_id,q_answer,difficulty,q_type FROM tester.questions WHERE q_id = ?");
@@ -374,8 +447,11 @@ int dataBase::checkAnswer(int id,QVector<int> answers)
     query.exec();
     query.next();
     int type = query.value(3).toInt();
+    QString _correctAnswers = query.value(1).toString();
+    if (correctAnswer != NULL)
+        *correctAnswer = _correctAnswers;
     if (type == 1){
-        QString _correctAnswers = query.value(1).toString();
+
         QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
         QSet<int> tmp;
 
@@ -387,7 +463,7 @@ int dataBase::checkAnswer(int id,QVector<int> answers)
         }
     }
     if (type == 3 ||type == 4){
-        QString _correctAnswers = query.value(1).toString();
+
         QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
         QVector<int> tmp;
         foreach(QString num, correctAnswers){
@@ -438,14 +514,16 @@ bool dataBase::checkUser(QString userName, QString password)
 
 
 
-int dataBase::checkAnswer(int id, QString answer)
+int dataBase::checkAnswer(int id, QString answer, QString *correctAnswer)
 {
     QSqlQuery query(db);
     query.prepare("SELECT q_id,q_answer,difficulty FROM tester.questions WHERE q_id = ?");
     query.addBindValue(id);
     query.exec();
     query.next();
-    QString correctAnswer = query.value(1).toString();
+    if (correctAnswer != NULL){
+        *correctAnswer = query.value(1).toString();
+    }
     if (!QString::compare(answer,correctAnswer,Qt::CaseInsensitive)){
         return query.value(2).toInt();
     }
