@@ -10,6 +10,7 @@
 #include <fstream>
 #include <QString>
 #include <teacherwindow.h>
+#include <adminwindow.h>
 class TestWindow;
 namespace Ui {
 class MainWindow;

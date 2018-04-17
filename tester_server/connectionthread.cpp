@@ -49,7 +49,8 @@ void connectionThread::processTeacher()
     //password
     recv(sockDescriptor,buf,sizeof(buf),0);
     QString password(buf);
-    bool userExists = db.checkUser(userName,password);
+    int userType=0;
+    bool userExists = db.checkUser(userName,password,userType);
     if (userExists) {
        int status = CONN_OK;
        send(sockDescriptor,(char*)&status,sizeof(int),0);
@@ -59,6 +60,7 @@ void connectionThread::processTeacher()
         closesocket(sockDescriptor);
         return;
     }
+    send(sockDescriptor,(char*)&userType,sizeof(int),0);
     CmdProcess proc(opCode,sockDescriptor);
     closesocket(sockDescriptor);
 }

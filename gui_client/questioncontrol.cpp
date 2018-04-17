@@ -315,6 +315,8 @@ void QuestionControl::on_pushButton_3_clicked()
     ui->calendarWidget->show();
     ui->chooseExamDate->show();
     ui->addExam->show();
+    ui->groupBox->hide();
+    ui->tableWidget->hide();
 }
 
 void QuestionControl::on_addExam_clicked()
@@ -337,4 +339,7 @@ void QuestionControl::on_addExam_clicked()
     stream << questionList;
     Network & network = Network::getInstance();
     network.sendQuery(ADD_EXAM,request);
+    ui->calendarWidget->hide();
+    ui->chooseExamDate->hide();
+    ui->addExam->hide();
 }

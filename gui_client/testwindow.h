@@ -13,6 +13,7 @@
 #include <groupquestiondrawer.h>
 #include <qtimer.h>
 #include <QTime>
+#include <QLabel>
 namespace  Ui {
     class TestWindow;
 }
@@ -42,6 +43,7 @@ private:
     void showSequenceQuestion(QVector<int> restoreSequence = QVector<int>());
     void showMatchQuestion(QVector<int> restoreSequence = QVector<int>());
     QVector<QObject *> guiObjects;
+    QVector<QLabel *> labels;
     QGraphicsScene * scene;
     SequenceQuestionDrawer * drawer;
     GroupQuestionDrawer * gDrawer;

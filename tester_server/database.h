@@ -40,7 +40,7 @@ public:
     void addExam(int subject,QDate date,QByteArray questionList);
     QVector<QString> getSubjects();
     int getUserId(QString name);
-    bool checkUser(QString userName,QString password);
+    bool checkUser(QString userName,QString password,int & userType);
     int checkAnswer(int id,QVector<int> answers,QString * correctAnswer = NULL);
     int checkAnswer(int id,QString answer,QString * correctAnswer = NULL);
     int getStudentCurrentExamState(int id,int & subject_id,int & question_select_type,QByteArray & question_list,int & exam_id);
@@ -63,6 +63,10 @@ public:
     void addTextNote(QString studAnswer,int id,int studId);
     void addTextNote(QVector<int> studAnswers,int id,int studId);
     QString getReport(int id);
+    void addUser(QVector<QString> values);
+    void deleteUser(int id);
+    QVector<QVector<QString> > findUsers(QVector<int> params, QVector<QString> values);
+    void resetPassword(int id,QString password);
 };
 
 #endif // DATABASE_H

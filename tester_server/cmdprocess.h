@@ -30,6 +30,10 @@ private:
     void sendReply(QByteArray reply= QByteArray());
     void getStudPassStatus();
     void viewReport();
+    void addUser();
+    void findUser();
+    void deleteUser();
+    void resetPassword();
     SOCKET sock;
 };
 

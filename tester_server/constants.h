@@ -26,6 +26,7 @@
 #define FILTER_LAST_NAME 3
 #define FILTER_STUD_TICKET 4
 #define FILTER_STUD_GROUP 5
+#define FILTER_LOGIN 6
 #define SELECT_QUESTION_TYPE 1  //выбор одного или нескольких вариантов
 #define INPUT_QUESTION_TYPE 2   //ввод ответа с клавиатуры
 #define SEQUENCE_QUESTION_TYPE 3//выбор последовательности действий
@@ -37,4 +38,10 @@
 #define SET_EXAM_TIME 26
 #define GET_PASS_STATE 27
 #define VIEW_REPORT 28
+#define ADD_USER 29
+#define DEL_USER 30
+#define FIND_USER 31
+#define RESET_PASSWORD 32
+#define USER_TEACHER 1
+#define USER_ADMIN 2
 #endif // CONNECTIONERROR_H

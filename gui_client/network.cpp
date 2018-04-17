@@ -61,6 +61,7 @@ int Network::checkUser()
             send(s,_password,40,0);
        int loginStatus;
        recv(s,(char*)&loginStatus,sizeof(int),0);
+       recv(s,(char*)&currentUserType,sizeof(int),0);
        return loginStatus;
        closesocket(s);
 }
@@ -97,6 +98,7 @@ QByteArray Network::sendQuery(int opCode, QByteArray query)
             send(s,_password,40,0);
        int loginStatus;
        recv(s,(char*)&loginStatus,sizeof(int),0);
+       recv(s,(char*)&currentUserType,sizeof(int),0);
        int replySize,querySize;
        querySize = query.size();
        send(s,(char*)&querySize,sizeof(int),0);

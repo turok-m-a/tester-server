@@ -87,9 +87,14 @@ void TestWindow::showQuestion(int number)
         for (int i=0;i<answerNumber;i++){
             QString answer = questions[number].getAnswerText(i);
             answer.remove(0,2);
-            QCheckBox * checkBox = new QCheckBox(answer, this);
+            QCheckBox * checkBox = new QCheckBox(this);
             guiObjects.push_back(checkBox);
             checkBox->setGeometry(600,100+i*50,500,25);
+            QLabel * label = new QLabel(answer,this);
+            label->setGeometry(620,100+i*50,400,25);
+            label->show();
+            label->setWordWrap(true);
+            labels.push_back(label);
             QFont f;
             f.setPixelSize(14);
             checkBox->setFont(f);
@@ -138,6 +143,7 @@ void TestWindow::hideQuestion() //сохранение ответов и скр�
     }
     if (questions[currentQuestion].type == SELECT_QUESTION_TYPE){
         for (int i =0 ;i<guiObjects.size(); i++) {
+            delete labels[i];
             QCheckBox * ptr = qobject_cast<QCheckBox*> (guiObjects[i]);
             if(ptr->isChecked()){
                 questions[currentQuestion].addAnswer(i);
@@ -162,7 +168,8 @@ void TestWindow::hideQuestion() //сохранение ответов и скр�
     foreach (i, guiObjects) {
         delete i;
     }
-    guiObjects.clear();
+    guiObjects.clear();    
+    labels.clear();
 }
 
 void TestWindow::showSequenceQuestion(QVector<int> restoreSequence)

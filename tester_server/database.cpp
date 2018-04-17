@@ -414,7 +414,7 @@ void dataBase::addQuestion(int type, int subjId, QString question, QString answe
     qId++;
     QString q("INSERT INTO tester.questions (q_id,q_type,subject_id,q_text,q_answer,difficulty) VALUES (");
     q.append(QString::number(qId)+" , "+QString::number(type)+" , "+QString::number(subjId)+" , ");
-    q.append("'"+question+"' , '"+answer+" , "+QString::number(difficulty)+"' )");
+    q.append("'"+question+"' , '"+answer+"' , "+QString::number(difficulty)+" )");
     query.exec(q);
     if(!advData.isEmpty()){
         query.prepare("UPDATE tester.questions SET q_adv_data = ? WHERE q_id = ?");
@@ -499,14 +499,15 @@ int dataBase::getUserId(QString name)
      return -1;
 }
 
-bool dataBase::checkUser(QString userName, QString password)
+bool dataBase::checkUser(QString userName, QString password, int &userType)
 {
     QSqlQuery query(db);
-    query.prepare("SELECT login,password FROM tester.users WHERE login = ? AND password =?");
+    query.prepare("SELECT login,password,user_type FROM tester.users WHERE login = ? AND password =?");
     query.addBindValue(userName);
     query.addBindValue(password);
     query.exec();
     if (query.next()){
+        userType = query.value(2).toInt();
         return true;
     }
     return false;
@@ -673,7 +674,6 @@ void dataBase::addStudent(QVector<QString> values)
 //    QString a(query2.executedQuery());
 
 }
-
 void dataBase::removeStudent(int id)
 {
     QSqlQuery query(db);
@@ -681,8 +681,79 @@ void dataBase::removeStudent(int id)
     query.addBindValue(id);
     query.exec();
 }
+void dataBase::addUser(QVector<QString> values){
+    QSqlQuery query(db),query2(db);
+     query.exec("SELECT MAX(teacher_id) FROM tester.users");
+     query.next();
+     int maxId = query.value(0).toInt() +1;
 
+    QString queryString("INSERT INTO tester.users (first_name,middle_name,last_name, login ,password,user_type,teacher_id) VALUES ( ");
+    for  (int i=0;i<6;i++){
+       queryString+=(QString("'") + values[i] + QString("'"));
+       queryString+= ", ";
+    }
+    queryString+=( QString::number(maxId));
+    queryString+= ")";
+    query2.exec(queryString);
+}
+void dataBase::deleteUser(int id){
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM tester.users WHERE teacher_id = ?");
+    query.addBindValue(id);
+    query.exec();
+}
+void dataBase::resetPassword(int id,QString password){
+    QSqlQuery query(db);
+    query.prepare("UPDATE tester.users SET password = ? WHERE teacher_id = ?");
+    query.addBindValue(password);
+    query.addBindValue(id);
+    query.exec();
+}
+QVector<QVector<QString> > dataBase::findUsers(QVector<int> params, QVector<QString> values)
+{
+    QSqlQuery query(db);
+    QString queryString("SELECT first_name,middle_name,last_name, login ,user_type,teacher_id FROM tester.users WHERE ");
+    QString where;
+    for (int i=0;i<params.size();i++){
+        switch (params[i]) {
+        case FILTER_FIRST_NAME:
+            where += QString("first_name LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_MIDDLE_NAME:
+            where += QString("middle_name LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_LAST_NAME:
+            where += QString("last_name LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        case FILTER_LOGIN:
+            where += QString("login LIKE '%") + values[i] + QString("%' "); ;
+            break;
+        default:
+            break;
+        }
+        if (i < (params.size()-1)){
+            where += QString(" AND ");
+        }
+    }
+    queryString += where;
+    query.exec(queryString);
+    if(params.isEmpty()){
+        query.clear();
+         query.prepare("SELECT first_name,middle_name,last_name, login ,user_type,teacher_id FROM tester.users");
+        query.exec();
+         //нет параметров фильтра
+    }
 
+    QVector<QVector<QString>> users;
+    while(query.next()){
+        QVector<QString> user;
+        for (int i=0;i<6;i++){
+        user.push_back(query.value(i).toString());
+        }
+        users.push_back(user);
+    }
+    return users;
+}
 
 
 

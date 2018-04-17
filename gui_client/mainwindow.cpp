@@ -84,10 +84,16 @@ void MainWindow::teacherLogin()
     }
     if (loginStatus == CONN_OK){
     network.studLogin = ui->login->text();
-    network.currentUserType = 1;
-    TeacherWindow * teacherWindow = new TeacherWindow();
-    teacherWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
-    teacherWindow->show();
+    if (network.currentUserType == 1){
+        TeacherWindow * teacherWindow = new TeacherWindow();
+        teacherWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
+        teacherWindow->show();
+    }
+    if (network.currentUserType == USER_ADMIN){
+        AdminWindow * aw = new AdminWindow();
+        aw->setAttribute(Qt::WA_DeleteOnClose);
+        aw->show();
+    }
     }
 }
 void MainWindow::handleButton()

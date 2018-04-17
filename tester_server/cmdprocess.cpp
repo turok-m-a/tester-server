@@ -59,6 +59,18 @@ CmdProcess::CmdProcess(int opCode, SOCKET _sock)
     case VIEW_REPORT:
         viewReport();
         break;
+    case ADD_USER:
+        addUser();
+        break;
+    case FIND_USER:
+        findUser();
+        break;
+    case DEL_USER:
+        deleteUser();
+        break;
+    case RESET_PASSWORD:
+        resetPassword();
+        break;
     default:
         break;
     }
@@ -108,9 +120,9 @@ void CmdProcess::addQuestion()
     int questionType,subjectId,difficulty;
     QString questionText,answerText;
     QByteArray advData;
-    stream >> questionType >> subjectId >> questionText >> answerText;
+    stream >> questionType >> subjectId >> questionText >> answerText  >> difficulty;
     if (questionType == SEQUENCE_QUESTION_TYPE || questionType == MATCH_QUESTION_TYPE){
-        stream >> advData >> difficulty;
+        stream >> advData;
     }
     dataBase & db = dataBase::getInstance();
     db.addQuestion(questionType,subjectId,questionText,answerText,advData,difficulty);
@@ -404,8 +416,6 @@ void CmdProcess::findSubject()
 void CmdProcess::removeSubject()
 {
     int byteArrayLen;
-
-
     QByteArray byteArray;
     recv(sock,(char*)&byteArrayLen,sizeof(int),0);//длина запроса
     byteArray.resize(byteArrayLen);
@@ -417,6 +427,57 @@ void CmdProcess::removeSubject()
     db.delSubject(studId);
     const int replySize = 0;
     send(sock,(char*)&replySize,sizeof(int),0);
+}
+void CmdProcess::addUser(){
+    QByteArray request = recvRequest();
+    QDataStream stream(&request, QIODevice::ReadWrite);
+    QVector<QString> values;
+    stream >> values;
+    dataBase & db = dataBase::getInstance();
+    db.addUser(values);
+    sendReply();
+}
+void CmdProcess::findUser(){
+    QByteArray request = recvRequest();
+    QDataStream stream(&request, QIODevice::ReadWrite);
+    QVector<QString> values;
+    QVector<int> params;
+    stream >> params >>values;
+    dataBase & db = dataBase::getInstance();
+    QVector<QVector<QString>> users = db.findUsers(params,values);
+    QByteArray reply;
+    QDataStream replyStream(&reply, QIODevice::ReadWrite);
+    replyStream << users.size();
+    for (int i=0;i<users.size();i++){
+        for (int j=0;j<6;j++){
+            replyStream << users[i][j];
+        }
+    }
+    sendReply(reply);
+}
+
+void CmdProcess::deleteUser()
+{
+       QByteArray request = recvRequest();
+        QDataStream stream(&request, QIODevice::ReadWrite);
+        int id;
+        stream >> id;
+        dataBase & db = dataBase::getInstance();
+        db.deleteUser(id);
+        sendReply();
+}
+
+void CmdProcess::resetPassword()
+{
+    QByteArray request = recvRequest();
+     QDataStream stream(&request, QIODevice::ReadWrite);
+     int id;
+     QString password;
+     stream >> id;
+     stream >> password;
+     dataBase & db = dataBase::getInstance();
+     db.resetPassword(id,password);
+     sendReply();
 }
 
 
