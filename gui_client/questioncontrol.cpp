@@ -5,6 +5,8 @@ QuestionControl::QuestionControl(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QuestionControl)
 {
+    signalMapper = new QSignalMapper(this);
+    connect(signalMapper,SIGNAL(mapped(QString)),this,SLOT(questionCheckStateChanged(QString)));
     subjListIsEmpty = true;
     ui->setupUi(this);
     ui->groupBox->hide();
@@ -66,7 +68,6 @@ void QuestionControl::on_subjectList_currentIndexChanged(int index)
      reply = network.sendQuery(GET_QUESTION_LIST,byteArray);
      int qNumber;
      stream2 >> qNumber;
-   QVector<QVector <QString>> questions;
    stream2 >> questions;
     QString columnText;
      for (int i=0;i<qNumber;i++){
@@ -75,7 +76,10 @@ void QuestionControl::on_subjectList_currentIndexChanged(int index)
           columnText = questions[i][j];
           ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
          }
-         ui->tableWidget->setCellWidget(0,5,new QCheckBox());
+         QCheckBox * chkBox = new QCheckBox();
+         connect(chkBox,SIGNAL(toggled(bool)),signalMapper,SLOT(map()));
+         signalMapper->setMapping(chkBox,questions[i][3]);
+         ui->tableWidget->setCellWidget(0,5,chkBox);
      }
      ui->tableWidget->resizeRowsToContents();
 }
@@ -342,4 +346,42 @@ void QuestionControl::on_addExam_clicked()
     ui->calendarWidget->hide();
     ui->chooseExamDate->hide();
     ui->addExam->hide();
+
+    ui->groupBox->show();
+    ui->tableWidget->show();
+}
+
+void QuestionControl::questionCheckStateChanged(QString id)
+{
+    int qId = id.toInt();
+    int index = selectedQuestionIds.indexOf(qId);
+    if (index == -1){
+        selectedQuestionIds.push_back(qId);
+        qDebug() << qId;
+    } else {
+        selectedQuestionIds.remove(index);
+    }
+}
+
+void QuestionControl::on_findQuestion_textChanged(const QString &arg1)
+{
+    ui->tableWidget->setRowCount(0);
+    for (int i=0;i<questions.size();i++){
+        if (questions[i][1].indexOf(arg1,0,Qt::CaseInsensitive) == -1){
+            continue;
+        }
+        ui->tableWidget->insertRow(0);
+        for (int j=0;j<5;j++){//тип,вопрос-ответ,предмет,ID(скрыт),сложность
+         QString columnText = questions[i][j];
+         ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
+        }
+        QCheckBox * chkBox = new QCheckBox();
+        if (selectedQuestionIds.contains(questions[i][3].toInt())){
+            chkBox->setChecked(true);
+        }
+        connect(chkBox,SIGNAL(toggled(bool)),signalMapper,SLOT(map()));
+        signalMapper->setMapping(chkBox,questions[i][3]);
+        ui->tableWidget->setCellWidget(0,5,chkBox);
+    }
+    ui->tableWidget->resizeRowsToContents();
 }

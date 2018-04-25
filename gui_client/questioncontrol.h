@@ -2,9 +2,11 @@
 #define QUESTIONCONTROL_H
 
 #include <QDialog>
+#include <QDebug>
 #include <network.h>
 #include <qcheckbox.h>
 #include <QTableWidgetItem>
+#include <QSignalMapper>
 namespace Ui {
 class QuestionControl;
 }
@@ -43,12 +45,17 @@ private slots:
     void on_pushButton_3_clicked();
 
     void on_addExam_clicked();
+    void questionCheckStateChanged(QString id);
+    void on_findQuestion_textChanged(const QString &arg1);
 
 private:
+    QVector<QVector <QString>> questions;
+    QSignalMapper * signalMapper;
     Ui::QuestionControl *ui;
     QVector<QString> subjectName;
      QVector<int> subjectId;
      bool subjListIsEmpty;
+     QVector<int> selectedQuestionIds;
      void formatQuestionText(QString & text);
 };
 
