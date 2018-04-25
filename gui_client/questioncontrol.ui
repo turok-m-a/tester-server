@@ -347,7 +347,7 @@
     <rect>
      <x>580</x>
      <y>120</y>
-     <width>161</width>
+     <width>181</width>
      <height>22</height>
     </rect>
    </property>
@@ -416,7 +416,7 @@
     <rect>
      <x>580</x>
      <y>90</y>
-     <width>161</width>
+     <width>181</width>
      <height>20</height>
     </rect>
    </property>
@@ -424,6 +424,84 @@
     <string>Поиск по тексту вопроса или ответа</string>
    </property>
   </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>40</y>
+     <width>181</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Сложность</string>
+   </property>
+   <widget class="QLineEdit" name="above">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>мин.</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="below">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>20</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>макс.</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLineEdit" name="nRandNum">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>560</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="nRandButton">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>550</y>
+     <width>291</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Выбрать                           случайных из отображаемых</string>
+   </property>
+  </widget>
+  <zorder>nRandButton</zorder>
+  <zorder>subjectList</zorder>
+  <zorder>tableWidget</zorder>
+  <zorder>addQuestion</zorder>
+  <zorder>delQuestion</zorder>
+  <zorder>groupBox</zorder>
+  <zorder>pushButton_2</zorder>
+  <zorder>pushButton_3</zorder>
+  <zorder>addToSubject</zorder>
+  <zorder>subjectList2</zorder>
+  <zorder>calendarWidget</zorder>
+  <zorder>chooseExamDate</zorder>
+  <zorder>addExam</zorder>
+  <zorder>findQuestion</zorder>
+  <zorder>groupBox_2</zorder>
+  <zorder>nRandNum</zorder>
  </widget>
  <resources/>
  <connections/>

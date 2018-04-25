@@ -48,6 +48,13 @@ private slots:
     void questionCheckStateChanged(QString id);
     void on_findQuestion_textChanged(const QString &arg1);
 
+
+    void on_above_textChanged(const QString &arg1);
+
+    void on_below_textChanged(const QString &arg1);
+
+    void on_nRandButton_clicked();
+
 private:
     QVector<QVector <QString>> questions;
     QSignalMapper * signalMapper;

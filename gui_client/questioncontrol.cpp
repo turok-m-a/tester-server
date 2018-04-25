@@ -294,6 +294,8 @@ void QuestionControl::formatQuestionText(QString &text)
     }
 }
 
+
+
 void QuestionControl::on_answersNumber2_editingFinished()
 {
     int newRowCount = ui->answersNumber2->text().toInt();
@@ -331,11 +333,14 @@ void QuestionControl::on_addExam_clicked()
     stream << currentSubjId;
     QDataStream qStream(&questionList, QIODevice::WriteOnly);
     qStream.setByteOrder(QDataStream::LittleEndian);
-    for (int i=0;i<ui->tableWidget->rowCount();i++){
-        if(qobject_cast<QCheckBox*>(ui->tableWidget->cellWidget(i,5))->isChecked()){
-            int qId = ui->tableWidget->item(i,3)->text().toInt();
-            qStream << qId;
-        }
+//    for (int i=0;i<ui->tableWidget->rowCount();i++){
+//        if(qobject_cast<QCheckBox*>(ui->tableWidget->cellWidget(i,5))->isChecked()){
+//            int qId = ui->tableWidget->item(i,3)->text().toInt();
+//            qStream << qId;
+//        }
+//    }   //не то
+    foreach (int qId, selectedQuestionIds) {
+        qStream << qId;
     }
     QDate date = ui->calendarWidget->selectedDate();
     //QString dateStr = date.toString(Qt::ISODate);
@@ -366,8 +371,20 @@ void QuestionControl::questionCheckStateChanged(QString id)
 void QuestionControl::on_findQuestion_textChanged(const QString &arg1)
 {
     ui->tableWidget->setRowCount(0);
+    bool ok;
+    int  belowDifficulty = ui->below->text().toInt(&ok);
+    if (!ok && !ui->below->text().isEmpty()) return;
+    if (ui->below->text().isEmpty()){
+        belowDifficulty = 10;
+    }
+    int  aboveDifficulty = ui->above->text().toInt(&ok);
+    if (!ok && !ui->above->text().isEmpty()) return;
+    if (ui->above->text().isEmpty()){
+        aboveDifficulty = 0;
+    }
     for (int i=0;i<questions.size();i++){
-        if (questions[i][1].indexOf(arg1,0,Qt::CaseInsensitive) == -1){
+        if (questions[i][4].toInt() > belowDifficulty || questions[i][4].toInt() < aboveDifficulty || !questions[i][1].contains(
+                    ui->findQuestion->text(),Qt::CaseInsensitive)){
             continue;
         }
         ui->tableWidget->insertRow(0);
@@ -384,4 +401,98 @@ void QuestionControl::on_findQuestion_textChanged(const QString &arg1)
         ui->tableWidget->setCellWidget(0,5,chkBox);
     }
     ui->tableWidget->resizeRowsToContents();
+}
+
+
+
+void QuestionControl::on_above_textChanged(const QString &arg1)
+{
+    bool ok;
+    int aboveDifficulty = arg1.toInt(&ok);
+    if (!ok && !arg1.isEmpty()) return;
+    if (arg1.isEmpty()){
+        aboveDifficulty = 0;
+    }
+    int  belowDifficulty = ui->below->text().toInt(&ok);
+    if (!ok && !ui->below->text().isEmpty()) return;
+    if (ui->below->text().isEmpty()){
+        belowDifficulty = 10;
+    }
+    ui->tableWidget->setRowCount(0);
+    for (int i=0;i<questions.size();i++){
+        if (questions[i][4].toInt() > belowDifficulty || questions[i][4].toInt() < aboveDifficulty || !questions[i][1].contains(
+                    ui->findQuestion->text(),Qt::CaseInsensitive)){
+            continue;
+        }
+        ui->tableWidget->insertRow(0);
+        for (int j=0;j<5;j++){//тип,вопрос-ответ,предмет,ID(скрыт),сложность
+         QString columnText = questions[i][j];
+         ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
+        }
+        QCheckBox * chkBox = new QCheckBox();
+        if (selectedQuestionIds.contains(questions[i][3].toInt())){
+            chkBox->setChecked(true);
+        }
+        connect(chkBox,SIGNAL(toggled(bool)),signalMapper,SLOT(map()));
+        signalMapper->setMapping(chkBox,questions[i][3]);
+        ui->tableWidget->setCellWidget(0,5,chkBox);
+    }
+    ui->tableWidget->resizeRowsToContents();
+}
+
+void QuestionControl::on_below_textChanged(const QString &arg1)
+{
+    bool ok;
+    int  belowDifficulty = arg1.toInt(&ok);
+    if (!ok && !arg1.isEmpty()) return;
+    if (arg1.isEmpty()){
+        belowDifficulty = 10;
+    }
+    int  aboveDifficulty = ui->above->text().toInt(&ok);
+    if (!ok && !ui->above->text().isEmpty()) return;
+    if (ui->above->text().isEmpty()){
+        aboveDifficulty = 0;
+    }
+    ui->tableWidget->setRowCount(0);
+
+    for (int i=0;i<questions.size();i++){
+        if (questions[i][4].toInt() > belowDifficulty || questions[i][4].toInt() < aboveDifficulty || !questions[i][1].contains(
+                    ui->findQuestion->text(),Qt::CaseInsensitive)){
+            continue;
+        }
+        ui->tableWidget->insertRow(0);
+        for (int j=0;j<5;j++){//тип,вопрос-ответ,предмет,ID(скрыт),сложность
+         QString columnText = questions[i][j];
+         ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
+        }
+        QCheckBox * chkBox = new QCheckBox();
+        if (selectedQuestionIds.contains(questions[i][3].toInt())){
+            chkBox->setChecked(true);
+        }
+        connect(chkBox,SIGNAL(toggled(bool)),signalMapper,SLOT(map()));
+        signalMapper->setMapping(chkBox,questions[i][3]);
+        ui->tableWidget->setCellWidget(0,5,chkBox);
+    }
+    ui->tableWidget->resizeRowsToContents();
+}
+
+void QuestionControl::on_nRandButton_clicked()
+{
+    QTime midnight(0,0,0);
+    qsrand(midnight.secsTo(QTime::currentTime()));
+    bool ok;
+    QVector<int> randQuestionsIds;
+    int n = ui->nRandNum->text().toInt(&ok);
+    if (!ok) return;
+    for(int i=0;i<n;i++){
+        int randRow= qrand() % ui->tableWidget->rowCount();
+        int qID = ui->tableWidget->item(randRow,3)->text().toInt();
+        if (randQuestionsIds.contains(qID)){
+            i--;
+        } else {
+            randQuestionsIds.push_back(qID);
+        }
+    }
+    selectedQuestionIds = randQuestionsIds;
+    on_below_textChanged(ui->below->text());
 }
