@@ -44,4 +44,9 @@
 #define RESET_PASSWORD 32
 #define USER_TEACHER 1
 #define USER_ADMIN 2
+
+#define DB_HOST "localhost"
+#define DB_NAME "tester"
+#define DB_USER "tester"
+#define DB_PASSWORD "12345"
 #endif // CONNECTIONERROR_H

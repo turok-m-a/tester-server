@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>645</width>
+    <width>552</width>
     <height>282</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Проведение теста</string>
   </property>
   <widget class="QTableWidget" name="examList">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>411</width>
+     <width>331</width>
      <height>231</height>
     </rect>
    </property>
@@ -30,6 +30,9 @@
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
     <number>160</number>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
    </attribute>
    <column>
     <property name="text">
@@ -48,33 +51,20 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>350</x>
      <y>130</y>
      <width>191</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Добавить студентов к экзамену</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="delExam">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>160</y>
-     <width>191</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Удалить экзамен</string>
+    <string>Допустить студентов к тесту</string>
    </property>
   </widget>
   <widget class="QComboBox" name="subjList">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>350</x>
      <y>40</y>
      <width>191</width>
      <height>22</height>
@@ -87,20 +77,20 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>350</x>
      <y>70</y>
      <width>191</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Начать/продолжить экзамен</string>
+    <string>Начать/продолжить тест</string>
    </property>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>350</x>
      <y>100</y>
      <width>101</width>
      <height>16</height>
@@ -113,7 +103,7 @@
   <widget class="QLineEdit" name="examTime">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>460</x>
      <y>100</y>
      <width>81</width>
      <height>20</height>
@@ -126,8 +116,8 @@
   <widget class="QPushButton" name="viewReport">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>190</y>
+     <x>350</x>
+     <y>160</y>
      <width>191</width>
      <height>23</height>
     </rect>

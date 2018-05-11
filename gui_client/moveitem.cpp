@@ -38,7 +38,7 @@ void MoveItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     QPointF p(event->pos());
    // p.rx() = (qreal)(((int)p.rx()/xGrid)*xGrid);
    // p.ry() = (qreal)(((int)p.ry()/yGrid)*yGrid);
-
+    this->prepareGeometryChange();
     this->setPos(mapToScene(p));
      Q_UNUSED(event);
 }
@@ -62,8 +62,10 @@ void MoveItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     this->setCursor(QCursor(Qt::ArrowCursor));
     double xx=x();
     double yy=y();
-    if((int)xx / xGrid != xx/(double)xGrid) xx=(double)xGrid*round(xx/(double)xGrid);
-    if((int)yy / yGrid != yy/(double)yGrid) yy=(double)yGrid*round(yy/(double)yGrid);
+    //if((int)xx / xGrid != xx/(double)xGrid)
+        xx=(double)xGrid*round(xx/(double)xGrid);
+    //if((int)yy / yGrid != yy/(double)yGrid)
+        yy=(double)yGrid*round(yy/(double)yGrid);
         setPos(xx,yy);
     Q_UNUSED(event);
 
@@ -81,31 +83,31 @@ int MoveItem::getQuestionNumber()
 
 qreal MoveItem::setText(QString _text)
 {
-   lines = 0;   //подсчет кол-ва строк с учетом переноса слов
-   int symbolCounter = xSize/6;
+    lines = 0;   //подсчет кол-ва строк с учетом переноса слов
+    int symbolCounter = xSize/6; //символов на строку
 
-   for(int i=0;i<_text.size();i++){
-       if(_text[i] == "\n" || symbolCounter == 0){
-           symbolCounter =  xSize/6;
-           lines++;
-       } else {
-           if (_text[i] == ' ' && (_text.indexOf(' ',i+1)-i) >= symbolCounter ){
-               //перенос слова без разрыва
-               symbolCounter =  xSize/6;
-               lines++;
-               _text.insert(i,'\n');
-               i++;
-           } else {
-           symbolCounter--;
-           }
-       }
-   }
-//   if(_text.size()< xSize/6 && lines == 0){
-//       lines = 1;
-//   }
-   lines++;
-   text = _text;
-   return positionY + lines*15 + 15;
+    for(int i=0;i<_text.size();i++){
+        if(_text[i] == "\n" || symbolCounter == 0){
+            symbolCounter =  xSize/6;
+            lines++;
+        } else {
+            if (_text[i] == ' ' && (_text.indexOf(' ',i+1)-i) >= symbolCounter ){
+                //перенос слова без разрыва
+                symbolCounter =  xSize/6;
+                lines++;
+                _text.insert(i,'\n');
+                i++;
+            } else {
+                symbolCounter--;
+            }
+        }
+    }
+    //   if(_text.size()< xSize/6 && lines == 0){
+    //       lines = 1;
+    //   }
+    lines++;
+    text = _text;
+    return positionY + lines*15 + 15;
 }
 
 void MoveItem::setPositionY(qreal pos)

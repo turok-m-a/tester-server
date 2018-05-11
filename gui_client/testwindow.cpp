@@ -44,6 +44,10 @@ void TestWindow::timerUpdate()
 
 void TestWindow::on_nextButton_clicked()
 {
+    if (currentQuestion == questions.size()-2){
+        ui->nextButton->setEnabled(false);
+    }
+    ui->prevButton->setEnabled(true);
     if(currentQuestion == questions.size()-1) return;
     hideQuestion();
     currentQuestion++;
@@ -52,6 +56,10 @@ void TestWindow::on_nextButton_clicked()
 
 void TestWindow::on_prevButton_clicked()
 {
+    if (currentQuestion == 1){
+        ui->prevButton->setEnabled(false);
+    }
+    ui->nextButton->setEnabled(true);
     if(currentQuestion == 0) return;
     hideQuestion();
     currentQuestion--;
@@ -59,12 +67,17 @@ void TestWindow::on_prevButton_clicked()
 }
 
 void TestWindow::on_submitButton_clicked()
-{
-    hideQuestion();
+{    
     Network & network = Network::getInstance();
     float mark = network.sendQuestions(questions);
+    if (mark == -1.0){
+        infowindow * infoWindow = new infowindow(0,QString("Ошибка соединения с сервером.\nПопробуйте завершить тест позже.") +  QString::number(mark));
+        infoWindow->show();
+        return;
+    }
     infowindow * infoWindow = new infowindow(0,QString("\nВаша оценка: ") +  QString::number(mark));
     infoWindow->show();
+    hideQuestion();
     //ui->label->setText(QString("\nВаша оценка: ") +  QString::number(mark));
     this->close();
 }
@@ -183,7 +196,7 @@ void TestWindow::showSequenceQuestion(QVector<int> restoreSequence)
     graphicsView->setScene(scene);  // Устанавливаем графическую сцену в graphicsView
     graphicsView->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
     graphicsView->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
-    graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     graphicsView->show();
     scene->setSceneRect(0,0,450,550); // Устанавливаем размер сцены
     drawer = new SequenceQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene,restoreSequence);
@@ -202,7 +215,7 @@ void TestWindow::showMatchQuestion(QVector<int> restoreSequence)
     graphicsView->setScene(scene);  // Устанавливаем графическую сцену в graphicsView
     graphicsView->setRenderHint(QPainter::Antialiasing);    // Настраиваем рендер
     graphicsView->setCacheMode(QGraphicsView::CacheBackground); // Кэш фона
-    graphicsView->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     graphicsView->show();
     scene->setSceneRect(0,0,1000,460); // Устанавливаем размер сцены
     gDrawer = new GroupQuestionDrawer(questions[currentQuestion].getAdvancedData(),scene,restoreSequence);

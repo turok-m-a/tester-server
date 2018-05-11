@@ -9,7 +9,7 @@ class CmdProcess
 {
 public:
     CmdProcess();
-    CmdProcess(int opCode,SOCKET _sock);
+    CmdProcess(int opCode, SOCKET _sock);
 private:
     void sendStudList();
     void addStudToList();

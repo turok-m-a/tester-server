@@ -19,15 +19,13 @@ GroupQuestionDrawer::GroupQuestionDrawer(QByteArray questionData, QGraphicsScene
             answers.push_back(QString::fromUtf8(temp));
             temp.clear();
             i+=1;
-
-            temp.clear();
         }
 
     }
     if (restoreSequence.isEmpty()){
     foreach (QString str, answers) {
         MoveItem * item = new MoveItem(0,xAnswerSize,15,xAnswerSize-1);
-        item->setPositionY(0);
+        item->setPositionY(columnsLastPosition[currentColumn]);
         item->setPos(currentColumn*xAnswerSize, columnsLastPosition[currentColumn]);
         columnsLastPosition[currentColumn] = item->setText(str);
         // рисуем поочередно ответы слева направо
@@ -44,7 +42,7 @@ GroupQuestionDrawer::GroupQuestionDrawer(QByteArray questionData, QGraphicsScene
         lineLastPosition.fill(0,columnsLastPosition.size());
         for (int i=0;i<answers.size();i++){
         MoveItem * item = new MoveItem(0,xAnswerSize,15,xAnswerSize-1);
-        item->setPositionY(0);
+        item->setPositionY(columnsLastPosition[currentColumn]);
         item->setPos(restoreSequence[i]*xAnswerSize, columnsLastPosition[restoreSequence[i]]);
         columnsLastPosition[restoreSequence[i]] = item->setText(answers[i]);
 

@@ -24,7 +24,7 @@ public:
 public:
     connectionThread(SOCKET s,QObject* parent);
     void run();
-    bool authorization();
+   // bool authorization();
 
 };
 

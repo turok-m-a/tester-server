@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Вопросы</string>
   </property>
   <widget class="QComboBox" name="subjectList">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>60</y>
+     <y>30</y>
      <width>201</width>
      <height>22</height>
     </rect>
@@ -32,9 +32,6 @@
      <height>391</height>
     </rect>
    </property>
-   <property name="editTriggers">
-    <set>QAbstractItemView::NoEditTriggers</set>
-   </property>
    <property name="selectionMode">
     <enum>QAbstractItemView::SingleSelection</enum>
    </property>
@@ -46,6 +43,9 @@
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
     <number>176</number>
+   </attribute>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
    </attribute>
    <attribute name="verticalHeaderDefaultSectionSize">
     <number>30</number>
@@ -85,7 +85,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>90</y>
+     <y>60</y>
      <width>201</width>
      <height>23</height>
     </rect>
@@ -98,7 +98,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>120</y>
+     <y>90</y>
      <width>201</width>
      <height>23</height>
     </rect>
@@ -288,6 +288,12 @@
       <height>20</height>
      </rect>
     </property>
+    <property name="text">
+     <string>5</string>
+    </property>
+    <property name="placeholderText">
+     <string/>
+    </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
@@ -303,37 +309,11 @@
     </property>
    </widget>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>90</y>
-     <width>281</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Удалить для текущего предмета</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_3">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>60</y>
-     <width>281</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Сформировать экзамен с выбранными вопросами</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="addToSubject">
    <property name="geometry">
     <rect>
-     <x>290</x>
-     <y>120</y>
+     <x>240</x>
+     <y>60</y>
      <width>281</width>
      <height>23</height>
     </rect>
@@ -345,8 +325,8 @@
   <widget class="QComboBox" name="subjectList2">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>120</y>
+     <x>530</x>
+     <y>60</y>
      <width>181</width>
      <height>22</height>
     </rect>
@@ -395,14 +375,14 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>50</x>
      <y>330</y>
-     <width>171</width>
+     <width>241</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Добавить экзамен</string>
+    <string>Завершить формирование теста</string>
    </property>
    <property name="default">
     <bool>false</bool>
@@ -411,24 +391,47 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="findQuestion">
+  <widget class="QLineEdit" name="nRandNum">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>90</y>
-     <width>181</width>
-     <height>20</height>
+     <x>180</x>
+     <y>560</y>
+     <width>51</width>
+     <height>21</height>
     </rect>
    </property>
-   <property name="placeholderText">
-    <string>Поиск по тексту вопроса или ответа</string>
+  </widget>
+  <widget class="QPushButton" name="nRandButton">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>550</y>
+     <width>301</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Выбрать                           случайных из отображаемых</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>90</y>
+     <width>281</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Удалить для текущего предмета</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>40</y>
+     <x>30</x>
+     <y>110</y>
      <width>181</width>
      <height>41</height>
     </rect>
@@ -463,27 +466,30 @@
     </property>
    </widget>
   </widget>
-  <widget class="QLineEdit" name="nRandNum">
+  <widget class="QLineEdit" name="findQuestion">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>560</y>
-     <width>51</width>
-     <height>21</height>
+     <x>240</x>
+     <y>130</y>
+     <width>181</width>
+     <height>20</height>
     </rect>
    </property>
+   <property name="placeholderText">
+    <string>Поиск по тексту вопроса или ответа</string>
+   </property>
   </widget>
-  <widget class="QPushButton" name="nRandButton">
+  <widget class="QPushButton" name="pushButton_3">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>410</x>
      <y>550</y>
-     <width>291</width>
+     <width>281</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>Выбрать                           случайных из отображаемых</string>
+    <string>Сформировать тест с выбранными вопросами</string>
    </property>
   </widget>
   <zorder>nRandButton</zorder>
@@ -492,16 +498,16 @@
   <zorder>addQuestion</zorder>
   <zorder>delQuestion</zorder>
   <zorder>groupBox</zorder>
-  <zorder>pushButton_2</zorder>
-  <zorder>pushButton_3</zorder>
   <zorder>addToSubject</zorder>
   <zorder>subjectList2</zorder>
   <zorder>calendarWidget</zorder>
   <zorder>chooseExamDate</zorder>
   <zorder>addExam</zorder>
-  <zorder>findQuestion</zorder>
-  <zorder>groupBox_2</zorder>
   <zorder>nRandNum</zorder>
+  <zorder>pushButton_2</zorder>
+  <zorder>groupBox_2</zorder>
+  <zorder>findQuestion</zorder>
+  <zorder>pushButton_3</zorder>
  </widget>
  <resources/>
  <connections/>

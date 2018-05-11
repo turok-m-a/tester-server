@@ -1,18 +1,48 @@
 #include "database.h"
 
+void dataBase::init()
+{
+    if (settingsInit){
+        return;
+    }
+    QFile config("config.ini");
+    //config.open("config.ini");
+    if(!config.open(QIODevice::ReadOnly | QIODevice::Text)){
+        puts("config.ini not found!");
+        exit(0);
+    }
+    QTextStream in(&config);
+    address = in.readLine();
+    dbName = in.readLine();
+    login = in.readLine();
+    password = in.readLine();
+    config.close();
+    settingsInit = true;
+}
 dataBase::dataBase()
 {
-    db = QSqlDatabase::addDatabase("QMYSQL", "mydb");
-    db.setHostName("localhost");
-    db.setDatabaseName("tester");
-    db.setUserName("tester");
-    db.setPassword("12345");
-    bool ok = db.open();
+    const QString adr = address;
+    db = QSqlDatabase::addDatabase("QMYSQL", "my_db_" + QString::number((quint64)QThread::currentThread(), 16));
+    db.setHostName(adr);
+    db.setDatabaseName(dbName);
+    db.setUserName(login);
+    db.setPassword(password);
+    connected = db.open();
 }
 
+dataBase::~dataBase()
+{
+    db.close();
+}
 
+bool dataBase::settingsInit = false;
+QString dataBase::address = "";
+QString dataBase::dbName = "";
+QString dataBase::login = "";
+QString dataBase::password = "";
 void dataBase::addSubject(QString name)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     QSqlQuery q2(db);
     q2.exec("SELECT max(subject_id) FROM tester.subjects");
@@ -29,6 +59,7 @@ void dataBase::addSubject(QString name)
 
 void dataBase::delSubject(int id)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
      query.prepare("DELETE FROM subjects WHERE subject_id = ?");
      query.addBindValue(id);
@@ -37,6 +68,7 @@ void dataBase::delSubject(int id)
 
 QVector<QVector<QString> > dataBase::findSubject(QString name)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     QString q("SELECT name, subject_id FROM tester.subjects WHERE name LIKE ");
     name.insert(0,"'%");
@@ -59,6 +91,8 @@ QString dataBase::textQuestionFormat(QString questionText,int type,QString answe
         for(int i =1 ;i<questionText.size();i++){
             if(questionText[i] == QChar('$') && questionText[i-1] != QChar('#')){
                 questionText[i] = '\n';
+                questionText.insert(i+2,')');
+                i++;
             }
         }
         questionText.append("\nправильный(е) ответ(ы):\n");
@@ -73,6 +107,8 @@ QString dataBase::textQuestionFormat(QString questionText,int type,QString answe
         for(int i =1 ;i<questionText.size();i++){
             if(questionText[i] == QChar('$') && questionText[i-1] != QChar('#')){
                 questionText[i] = '\n';
+                questionText.insert(i+2,' ');
+                i++;
             }
         }
     }
@@ -90,6 +126,7 @@ void dataBase::addOnesToAnswerString(QString &answer)
 
 void dataBase::setExamTime(int time, int id,bool & alreadySet)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT exam_time FROM exams WHERE exam_id = ?");
     query.addBindValue(id);
@@ -108,6 +145,7 @@ void dataBase::setExamTime(int time, int id,bool & alreadySet)
 
 void dataBase::deleteExam(int id)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("DELETE FROM exams WHERE exam_id = ?");
     query.addBindValue(id);
@@ -116,6 +154,7 @@ void dataBase::deleteExam(int id)
 
 void dataBase::startExamForStudent(QVector<int> studIds, int examId, QVector<int> &passIds)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.exec("SELECT MAX(exam_pass_id) FROM exam_pass_status");
     query.next();
@@ -134,6 +173,7 @@ void dataBase::startExamForStudent(QVector<int> studIds, int examId, QVector<int
 
 bool dataBase::timeLimitExceed(int studId)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT time_limit FROM exam_pass_status WHERE pass_status = 11 AND stud_id = ?");
     query.addBindValue(studId);
@@ -148,6 +188,7 @@ bool dataBase::timeLimitExceed(int studId)
 
 QVector<QVector<QString> > dataBase::getExamList(int subjId)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT exam_id,date FROM exams WHERE subject_id = ?");
     query.addBindValue(subjId);
@@ -162,8 +203,9 @@ QVector<QVector<QString> > dataBase::getExamList(int subjId)
     return exams;
 }
 
-QVector<float> dataBase::getStudentPassStatus(QVector<int> passIds, int examId)
+QVector<float> dataBase::getStudentPassStatus(QVector<int> passIds)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     QVector<float> state;
 
@@ -179,6 +221,7 @@ QVector<float> dataBase::getStudentPassStatus(QVector<int> passIds, int examId)
 
 void dataBase::setStudentMark(int studId, float mark)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("UPDATE exam_pass_status SET pass_status = ? WHERE stud_id = ? AND pass_status = 11");
     query.addBindValue(mark);
@@ -188,6 +231,7 @@ void dataBase::setStudentMark(int studId, float mark)
 
 QVector<QVector<QString> > dataBase::getExamStudList(int examId)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     QVector<QVector<QString>> studList;
     QVector<int> passIds;
@@ -213,18 +257,11 @@ QVector<QVector<QString> > dataBase::getExamStudList(int examId)
         return studList;
 }
 
-int dataBase::getExamTime(int exam_id)
-{
-     QSqlQuery query(db);
-     query.prepare("SELECT exam_time FROM exams WHERE exam_id = ?");
-     query.addBindValue(exam_id);
-     query.exec();
-     query.next();
-     return query.value(0).toInt();
-}
+
 
 void dataBase::addTextNote(QString studAnswer, int id, int studId)
 {
+    //QSqlDatabase db = openConnection();
     QString q;
     QSqlQuery checkIfNull(db);
     checkIfNull.exec("SELECT text_note FROM exam_pass_status WHERE stud_id = "+QString::number(studId)+" AND pass_status = 11");
@@ -248,6 +285,7 @@ void dataBase::addTextNote(QString studAnswer, int id, int studId)
 
 void dataBase::addTextNote(QVector<int> studAnswers, int id, int studId)
 {
+    //QSqlDatabase db = openConnection();
     QString q;
     QSqlQuery checkIfNull(db);
     checkIfNull.exec("SELECT text_note FROM exam_pass_status WHERE stud_id = "+QString::number(studId)+" AND pass_status = 11");
@@ -274,6 +312,7 @@ void dataBase::addTextNote(QVector<int> studAnswers, int id, int studId)
 
 QString dataBase::getReport(int id)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT text_note FROM exam_pass_status WHERE exam_pass_id = ?");
     query.addBindValue(id);
@@ -283,6 +322,7 @@ QString dataBase::getReport(int id)
 }
 QVector<QVector<QString> > dataBase::getQuestions(int id,int questionId)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db),subquery(db);
     QString idText = QString::number(id);
     idText.insert(0,"'%");
@@ -368,6 +408,7 @@ QVector<QVector<QString> > dataBase::getQuestions(int id,int questionId)
 
 void dataBase::removeQuestion(int id)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("DELETE FROM tester.questions WHERE q_id = ?");
     query.addBindValue(id);
@@ -376,6 +417,7 @@ void dataBase::removeQuestion(int id)
 
 void dataBase::editQuestionSubjects(int questionId, int editOperationType, int subjId)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT subject_id FROM tester.questions WHERE q_id = ?");
     query.addBindValue(questionId);
@@ -407,6 +449,7 @@ void dataBase::editQuestionSubjects(int questionId, int editOperationType, int s
 
 void dataBase::addQuestion(int type, int subjId, QString question, QString answer, QByteArray advData, int difficulty)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.exec("SELECT MAX(q_id) FROM tester.questions");
     query.next();
@@ -426,6 +469,7 @@ void dataBase::addQuestion(int type, int subjId, QString question, QString answe
 
 void dataBase::addExam(int subject, QDate date, QByteArray questionList)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.exec("SELECT MAX(exam_id) FROM tester.exams");
     query.next();
@@ -439,8 +483,9 @@ void dataBase::addExam(int subject, QDate date, QByteArray questionList)
     query.exec();
     const QSqlResult * debug = query.result();
 }
-int dataBase::checkAnswer(int id, QVector<int> answers, QString *correctAnswer)
+int dataBase::checkAnswer(int id, QVector<int> answers)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT q_id,q_answer,difficulty,q_type FROM tester.questions WHERE q_id = ?");
     query.addBindValue(id);
@@ -448,8 +493,8 @@ int dataBase::checkAnswer(int id, QVector<int> answers, QString *correctAnswer)
     query.next();
     int type = query.value(3).toInt();
     QString _correctAnswers = query.value(1).toString();
-    if (correctAnswer != NULL)
-        *correctAnswer = _correctAnswers;
+//    if (correctAnswer != NULL)
+//        *correctAnswer = _correctAnswers;
     if (type == 1){
 
         QStringList correctAnswers = _correctAnswers.split(";",QString::SkipEmptyParts);
@@ -477,6 +522,7 @@ int dataBase::checkAnswer(int id, QVector<int> answers, QString *correctAnswer)
 }
 QVector<QString> dataBase::getSubjects()
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.exec("SELECT name FROM subjects");
     QVector<QString> ret;
@@ -488,6 +534,7 @@ QVector<QString> dataBase::getSubjects()
 
 int dataBase::getUserId(QString name)
 {
+    //QSqlDatabase db = openConnection();
      QSqlQuery query(db);
      query.prepare("SELECT stud_id FROM tester.students WHERE stud_document_id = ?");
      query.addBindValue(name);
@@ -501,6 +548,7 @@ int dataBase::getUserId(QString name)
 
 bool dataBase::checkUser(QString userName, QString password, int &userType)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT login,password,user_type FROM tester.users WHERE login = ? AND password =?");
     query.addBindValue(userName);
@@ -517,6 +565,7 @@ bool dataBase::checkUser(QString userName, QString password, int &userType)
 
 int dataBase::checkAnswer(int id, QString answer, QString *correctAnswer)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT q_id,q_answer,difficulty FROM tester.questions WHERE q_id = ?");
     query.addBindValue(id);
@@ -531,33 +580,57 @@ int dataBase::checkAnswer(int id, QString answer, QString *correctAnswer)
     return 0;
 }
 
-int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_select_type, QByteArray &question_list, int &exam_id)
+int dataBase::getStudentCurrentExamState(int id, int &subject_id,  QByteArray &question_list, int &exam_id,int &time)
 {
+
+//QSqlDatabase db = openConnection();
     QSqlQuery query(db);
-    query.prepare("SELECT stud_id,exam_id,pass_status FROM tester.exam_pass_status WHERE stud_id = ? AND pass_status = 11");
-    //ищем строку с статусом экзамена, к которому в данный момент получен допуск (такой должен быть 1 т.к.
-    //препод добавляет студента когда тот приходит на экзамен)
+    query.prepare("SELECT stud_id,exam_id,pass_status,exam_pass_id FROM tester.exam_pass_status WHERE stud_id = ? AND pass_status = 11 ORDER BY exam_pass_id ASC");
     query.addBindValue(id);
     query.exec();
-    int pass_status;
-    if (query.next()){
+    int pass_status,passId;
+    if (query.last()){
        cout << "getStudentState found\n";
        exam_id = query.value(1).toInt();
        pass_status = query.value(2).toInt();
+       passId = query.value(3).toInt();
        query.prepare("SELECT subject_id,question_select_type,question_list,exam_time FROM tester.exams WHERE exam_id = ? ");
        query.addBindValue(exam_id);
        query.exec();
        query.next();
        subject_id = query.value(0).toInt();
-       question_select_type = query.value(1).toInt();
+       int question_select_type = query.value(1).toInt();
        question_list = query.value(2).toByteArray();
-       QDateTime time_limit = QDateTime::currentDateTime();
+       const QDateTime currTime = QDateTime::currentDateTime();
+
        qint64 seconds = query.value(3).toInt();
-       time_limit = time_limit.addSecs(seconds);
-       query.prepare("UPDATE exam_pass_status SET time_limit = ? WHERE stud_id = ?");
-       query.addBindValue(time_limit);
-       query.addBindValue(id);
+
+       query.clear();
+       query.prepare("SELECT time_limit FROM exam_pass_status WHERE exam_pass_id = ?");
+       query.addBindValue(passId);
        query.exec();
+       query.next();
+      QDateTime time_limit = query.value(0).toDateTime();
+       if (query.value(0).isNull()){
+           time_limit = currTime;
+           time_limit = time_limit.addSecs(seconds);
+           query.clear();
+           query.prepare("UPDATE exam_pass_status SET time_limit = ? WHERE stud_id = ?");
+           query.addBindValue(time_limit);
+           query.addBindValue(id);
+           query.exec();
+
+       }
+        query.clear();
+       query.prepare("SELECT exam_time FROM exams WHERE exam_id = ?");
+       query.addBindValue(exam_id);
+       query.exec();
+       query.next();
+       //time = query.value(0).toInt();
+       time =  time_limit.toSecsSinceEpoch() - currTime.toSecsSinceEpoch();
+       if (currTime.toSecsSinceEpoch() > time_limit.toSecsSinceEpoch()){
+           time = 6;
+       }
        return pass_status;
     } else {
         return -1; //нет прохождения экзамена в exam_pass_status, в котором есть допуск
@@ -567,6 +640,7 @@ int dataBase::getStudentCurrentExamState(int id, int &subject_id, int &question_
 
 int dataBase::getMaxMark(int id)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("SELECT difficulty FROM tester.questions WHERE q_id = ?");
     query.addBindValue(id);
@@ -577,6 +651,7 @@ int dataBase::getMaxMark(int id)
 
 QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     const int * q_ids =(const int *) question_list.constData();
     const int q_number = question_list.size()/sizeof(int);
@@ -608,6 +683,8 @@ QByteArray dataBase::getQuestionsForExam(QByteArray question_list)
 
 QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<QString> values)
 {
+
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     QString queryString("SELECT first_name,middle_name,last_name, students.group ,stud_document_id,stud_id FROM tester.students WHERE ");
     QString where;
@@ -652,11 +729,13 @@ QVector<QVector<QString> > dataBase::findStudents(QVector<int> params, QVector<Q
         }
         students.push_back(student);
     }
+    //db.close();
     return students;
 }
 
 void dataBase::addStudent(QVector<QString> values)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db),query2(db);
      query.exec("SELECT MAX(stud_id) FROM tester.students");
      query.next();
@@ -676,12 +755,14 @@ void dataBase::addStudent(QVector<QString> values)
 }
 void dataBase::removeStudent(int id)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("DELETE FROM tester.students WHERE stud_id = ?");
     query.addBindValue(id);
     query.exec();
 }
 void dataBase::addUser(QVector<QString> values){
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db),query2(db);
      query.exec("SELECT MAX(teacher_id) FROM tester.users");
      query.next();
@@ -697,20 +778,41 @@ void dataBase::addUser(QVector<QString> values){
     query2.exec(queryString);
 }
 void dataBase::deleteUser(int id){
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("DELETE FROM tester.users WHERE teacher_id = ?");
     query.addBindValue(id);
     query.exec();
 }
 void dataBase::resetPassword(int id,QString password){
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     query.prepare("UPDATE tester.users SET password = ? WHERE teacher_id = ?");
     query.addBindValue(password);
     query.addBindValue(id);
     query.exec();
 }
+
+void dataBase::closeConnection()
+{
+    db.close();
+    db = QSqlDatabase();
+}
+
+//QSqlDatabase *dataBase::openConnection()
+//{
+//    QSqlDatabase * db = new QSqlDatabase();
+//    *db = QSqlDatabase::addDatabase( "QSQLITE", "my_db_" + QString::number((quint64)QThread::currentThread(), 16));
+//    db->setHostName(DB_HOST);
+//    db->setDatabaseName(DB_NAME);
+//    db->setUserName(DB_USER);
+//    db->setPassword(DB_PASSWORD);
+//    db->open();
+//    return db;
+//}
 QVector<QVector<QString> > dataBase::findUsers(QVector<int> params, QVector<QString> values)
 {
+    //QSqlDatabase db = openConnection();
     QSqlQuery query(db);
     QString queryString("SELECT first_name,middle_name,last_name, login ,user_type,teacher_id FROM tester.users WHERE ");
     QString where;

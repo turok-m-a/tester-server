@@ -116,6 +116,13 @@ void AdminWindow::on_findUser_clicked()
          ui->tableWidget->insertRow(0);
          for (int j=0;j<6;j++){
          stream2 >> columnText;
+         if(j==4){
+             if (columnText.toInt() == 1){
+                 ui->tableWidget->setItem(0,j,new QTableWidgetItem("Преподаватель"));
+             } else {
+                 ui->tableWidget->setItem(0,j,new QTableWidgetItem("Администратор"));
+             }
+         } else
          ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
          }
      }

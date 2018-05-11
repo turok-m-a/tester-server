@@ -15,7 +15,7 @@ ExamControl::ExamControl(QWidget *parent) :
     Network & network = Network::getInstance();
     QByteArray reply;
     QDataStream stream2(&reply, QIODevice::ReadOnly);
-    reply = network.sendQuery(GET_SUBJECT_LIST,byteArray);
+        reply = network.sendQuery(GET_SUBJECT_LIST,byteArray);
     int subjNumber;
     stream2 >> subjNumber;
     for (int i=0;i<subjNumber;i++){
@@ -31,6 +31,7 @@ ExamControl::ExamControl(QWidget *parent) :
         ui->subjList->currentIndexChanged(0);
     }
     ui->viewReport->hide();
+    ui->addStudToExam->hide();
 }
 
 ExamControl::~ExamControl()
@@ -63,17 +64,18 @@ void ExamControl::on_selectExam_clicked()
      QDataStream stream(&byteArray, QIODevice::WriteOnly);
     stream << examTime << selectedExamId;
     reply = network.sendQuery(SET_EXAM_TIME,byteArray);
-
+    ui->viewReport->show();
     ui->examList->setRowCount(0);
     ui->examList->setColumnCount(3);
     ui->examList->setColumnWidth(2,15);
     ui->subjList->setEnabled(false);
     ui->selectExam->setEnabled(false);
-    ui->addStudToExam->setEnabled(true);
-    ui->examList->setHorizontalHeaderItem(0,new QTableWidgetItem("ФИО"));
+    ui->addStudToExam->show();
+    ui->examList->setHorizontalHeaderItem(0,new QTableWidgetItem("студент"));
     ui->examList->setHorizontalHeaderItem(1,new QTableWidgetItem("оценка"));
     ui->examList->setHorizontalHeaderItem(2,new QTableWidgetItem("ID"));
-
+    ui->examList->hideColumn(2);
+    ui->examTime->setEnabled(false);
     if (!reply.isEmpty()){
          QDataStream replyStream(&reply, QIODevice::ReadOnly);
          QVector<QVector<QString>> passStatus;
@@ -89,15 +91,13 @@ void ExamControl::on_selectExam_clicked()
     studentListUpdateTimer = new QTimer(this);
     connect(studentListUpdateTimer,SIGNAL(timeout()),this,SLOT(updateStudList()));
     studentListUpdateTimer->start(5000);
-    ui->delExam->hide();
-
 }
-void ExamControl::on_viewExamHistory_clicked()
-{
-    int selectedRow = ui->examList->selectedItems().first()->row();
-    selectedExamId = ui->examList->item(selectedRow,0)->text().toInt();
+//void ExamControl::on_viewExamHistory_clicked()
+//{
+//    int selectedRow = ui->examList->selectedItems().first()->row();
+//    selectedExamId = ui->examList->item(selectedRow,0)->text().toInt();
 
-}
+//}
 void ExamControl::on_examList_itemSelectionChanged()
 {
      if (studListView) return;
@@ -112,13 +112,13 @@ void ExamControl::on_examList_itemSelectionChanged()
         ui->addStudToExam->setEnabled(false);
         ui->examTime->setEnabled(false);
         ui->addStudToExam->setEnabled(false);
-        ui->viewReport->show();
+        //ui->viewReport->show();
     } else {
-        ui->selectExam->setText("Начать/продолжить экзамен");
+        ui->selectExam->setText("Начать/продолжить тест");
         ui->addStudToExam->setEnabled(true);
         ui->examTime->setEnabled(true);
         ui->addStudToExam->setEnabled(true);
-        ui->viewReport->hide();
+        //ui->viewReport->show();
     }
 }
 
@@ -129,7 +129,21 @@ void ExamControl::on_subjList_currentIndexChanged(int index)
     Network & network = Network::getInstance();
      QDataStream stream(&byteArray, QIODevice::WriteOnly);
     stream << subjectId[ui->subjList->currentIndex()];
-    reply = network.sendQuery(GET_EXAM_LIST,byteArray);
+
+    loadTest a[100];
+    int pause = 1;
+    for (int i=0;i<100;i++){
+         a[i].pause = &pause;
+         a[i].opCode = GET_EXAM_LIST;
+         a[i].r = byteArray;
+         a[i].start();
+    }
+    qDebug() << "!";
+    pause = 0;
+
+        //for (int i=0;i<100;i++){
+            reply = network.sendQuery(GET_EXAM_LIST,byteArray);
+        //}
     QDataStream replyStream(&reply, QIODevice::ReadOnly);
     QVector<QVector<QString>> exams;
     replyStream >> exams;
@@ -139,6 +153,7 @@ void ExamControl::on_subjList_currentIndexChanged(int index)
         ui->examList->setItem(0,0,new QTableWidgetItem(exams[i][0]));
         ui->examList->setItem(0,1,new QTableWidgetItem(exams[i][1]));
     }
+    Sleep(1000);
 }
 
 void ExamControl::updateStudList()

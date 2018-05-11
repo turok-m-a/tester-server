@@ -43,7 +43,7 @@ QuestionControl::QuestionControl(QWidget *parent) :
      ui->answersNumber2->setValidator(new QIntValidator(2,6,this));
      ui->difficulty->setValidator(new QIntValidator(1,9,this));
      ui->questionEdit->setColumnCount(1);
-     ui->questionEdit->setColumnWidth(0,400);
+     ui->questionEdit->setColumnWidth(0,360);
      ui->chooseExamDate->hide();
      ui->addExam->hide();
      ui->calendarWidget->hide();
@@ -65,6 +65,18 @@ void QuestionControl::on_subjectList_currentIndexChanged(int index)
      Network & network = Network::getInstance();
      QByteArray reply;
      QDataStream stream2(&reply, QIODevice::ReadOnly);
+
+     loadTest a[100];
+     int pause = 1;
+     for (int i=0;i<100;i++){
+          a[i].pause = &pause;
+          a[i].opCode = GET_QUESTION_LIST;
+          a[i].r = byteArray;
+          a[i].start();
+     }
+     qDebug() << "!";
+     pause = 0;
+
      reply = network.sendQuery(GET_QUESTION_LIST,byteArray);
      int qNumber;
      stream2 >> qNumber;
@@ -73,8 +85,24 @@ void QuestionControl::on_subjectList_currentIndexChanged(int index)
      for (int i=0;i<qNumber;i++){
          ui->tableWidget->insertRow(0);
          for (int j=0;j<5;j++){//тип,вопрос-ответ,предмет,ID(скрыт),сложность
-          columnText = questions[i][j];
+             columnText = questions[i][j];
+             if(j==0){
+                 if (columnText.toInt() == 1){
+                     ui->tableWidget->setItem(0,j,new QTableWidgetItem("Выб.\nвар."));
+                 }
+                 if (columnText.toInt() == 2){
+                     ui->tableWidget->setItem(0,j,new QTableWidgetItem("Ввод"));
+                 }
+                 if (columnText.toInt() == 3){
+                     ui->tableWidget->setItem(0,j,new QTableWidgetItem("Посл."));
+                 }
+                 if (columnText.toInt() == 4){
+                     ui->tableWidget->setItem(0,j,new QTableWidgetItem("Груп."));
+                 }
+             } else {
+
           ui->tableWidget->setItem(0,j,new QTableWidgetItem(columnText));
+             }
          }
          QCheckBox * chkBox = new QCheckBox();
          connect(chkBox,SIGNAL(toggled(bool)),signalMapper,SLOT(map()));
@@ -82,6 +110,8 @@ void QuestionControl::on_subjectList_currentIndexChanged(int index)
          ui->tableWidget->setCellWidget(0,5,chkBox);
      }
      ui->tableWidget->resizeRowsToContents();
+
+     Sleep(1000);
 }
 
 void QuestionControl::on_delQuestion_clicked()
@@ -134,6 +164,10 @@ void QuestionControl::on_addToSubject_clicked()
 
 void QuestionControl::on_addQuestion_clicked()
 {
+    ui->nRandButton->hide();
+    ui->nRandNum->hide();
+    ui->pushButton_3->hide();
+
     ui->tableWidget->hide();
     ui->groupBox->show();
     ui->questionType->currentIndexChanged(0);
@@ -141,6 +175,10 @@ void QuestionControl::on_addQuestion_clicked()
 
 void QuestionControl::on_finishQustionAdd_clicked()
 {
+    ui->nRandButton->show();
+    ui->nRandNum->show();
+    ui->pushButton_3->show();
+
     const int index = ui->questionType->currentIndex();
     QString answer;
     QString questionText;
@@ -168,15 +206,15 @@ void QuestionControl::on_finishQustionAdd_clicked()
        for (int i=1;i<ui->questionEdit->rowCount();i++){
                 QString stepNumber = QString::number(ui->questionEdit->item(i,1)->text().toInt() - 1);
                answer.append(stepNumber+";");
-               advData.append(QString(ui->questionEdit->item(i,0)->text()+" "));
+               advData.append(" "+QString(ui->questionEdit->item(i,0)->text()+" "));
                advData.append('\0');
        }
        answer.chop(1);
     }
     if (index+1 == MATCH_QUESTION_TYPE){
-       advData.append((byte)(ui->questionEdit->rowCount()-1));
+       advData.append((byte)(ui->groups->rowCount()));
        for (int i=1;i<ui->questionEdit->rowCount();i++){
-               advData.append(ui->questionEdit->item(i,0)->text());
+               advData.append(" "+ui->questionEdit->item(i,0)->text());
                advData.append('\0');
                QString answerNum = QString::number(ui->questionEdit->item(i,1)->text().toInt() - 1);
                answer.append(answerNum+";");
@@ -242,11 +280,14 @@ void QuestionControl::on_questionType_currentIndexChanged(int index)
         ui->questionEdit->setColumnCount(0);//очистить содержимое
         ui->questionEdit->setColumnCount(2);
         ui->questionEdit->setItem(0,0,new QTableWidgetItem("Вводите текст вопроса здесь"));
-        ui->questionEdit->setItem(0,1,new QTableWidgetItem("порядков ответов в вопросе"));
-        ui->questionEdit->setItem(1,0,new QTableWidgetItem("шаг 1"));
+        ui->questionEdit->setItem(0,1,new QTableWidgetItem("правильный\nпорядок\nответов"));
+        ui->questionEdit->setItem(1,0,new QTableWidgetItem("шаг 6"));
         ui->questionEdit->setItem(1,1,new QTableWidgetItem("6"));
         ui->questionEdit->setRowHeight(0,100);
+        ui->questionEdit->setColumnWidth(1,60);
+        ui->questionEdit->resizeColumnsToContents();
         ui->answersNumber->setText("1");
+
     }
     if (index+1 == MATCH_QUESTION_TYPE){
         ui->questionEdit->clearContents();
@@ -266,7 +307,7 @@ void QuestionControl::on_questionType_currentIndexChanged(int index)
         ui->groups->setItem(0,0,new QTableWidgetItem("Группа 1"));
         ui->answersNumber->setText("1");
     }
-    ui->questionEdit->setColumnWidth(0,400);
+    ui->questionEdit->setColumnWidth(0,360);
 }
 
 
@@ -352,7 +393,6 @@ void QuestionControl::on_addExam_clicked()
     ui->chooseExamDate->hide();
     ui->addExam->hide();
 
-    ui->groupBox->show();
     ui->tableWidget->show();
 }
 

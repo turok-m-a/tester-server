@@ -56,6 +56,7 @@ void MainWindow::studLogin()
     testWindow->setAttribute(Qt::WA_DeleteOnClose);//удаление объекта по закрытию окна
     testWindow->setQuestions(questions,network.getExamTime());
     testWindow->showWindow();
+    this->close();
     }
 }
 
@@ -107,6 +108,7 @@ void MainWindow::on_loginButton_clicked()
     } else {
         teacherLogin();
     }
+    this->close();
 }
 
 void MainWindow::on_studentSwitch_toggled(bool checked)

@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QDate>
 #include <reportview.h>
+#include <loadtest.h>
 namespace Ui {
 class ExamControl;
 }
@@ -31,7 +32,7 @@ private slots:
 
     void updateStudList();
     void addStudToExam();
-    void on_viewExamHistory_clicked();
+   // void on_viewExamHistory_clicked();
 
     void on_viewReport_clicked();
 
@@ -43,6 +44,7 @@ private:
     QVector<QString> studNames;
     int selectedExamId;
     int examTime;
+
     bool subjListIsEmpty;
     QVector<QString> addedStudentsNames;
     QVector<int> addedStudentsIds;

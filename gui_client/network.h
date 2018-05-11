@@ -6,6 +6,7 @@
 #include "winsock2.h"
 #include "constants.h"
 #include <QByteArray>
+#include <infowindow.h>
 class Network
 {
 private:
@@ -23,7 +24,7 @@ public:
     int getExamTime();
     void setUser(QString _login,QString _password);
     int checkUser();
-    QByteArray sendQuery(int opCode,QByteArray query);
+    QByteArray sendQuery(int opCode,QByteArray query,int * ok = NULL);
     static Network& getInstance() {
            static Network  instance;
            return instance;

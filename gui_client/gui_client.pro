@@ -39,7 +39,8 @@ SOURCES += \
     questioncontrol.cpp \
     examcontrol.cpp \
     reportview.cpp \
-    adminwindow.cpp
+    adminwindow.cpp \
+    loadtest.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -57,7 +58,8 @@ HEADERS += \
     questioncontrol.h \
     examcontrol.h \
     reportview.h \
-    adminwindow.h
+    adminwindow.h \
+    loadtest.h
 
 FORMS += \
         mainwindow.ui \
@@ -71,6 +73,7 @@ FORMS += \
     reportview.ui \
     adminwindow.ui
 win32: LIBS += -lws2_32
-
+QMAKE_LFLAGS += -static
+CONFIG += staticlib
 DISTFILES += \
     classdiagram.qmodel

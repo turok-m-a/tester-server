@@ -7,9 +7,9 @@
 #include <QMap>
 #ifdef QT_DEBUG
 #include <iostream>
-#include <constants.h>
-#endif
 
+#endif
+#include <constants.h>
 class GroupQuestionDrawer
 {
 private:

@@ -132,7 +132,7 @@ void StudControlWindow::on_addButton_clicked()
     QByteArray reply;
     QDataStream stream2(&reply, QIODevice::ReadOnly);
     reply = network.sendQuery(ADD_STUDENT,byteArray);
-
+    on_findButton_clicked();
 }
 
 void StudControlWindow::on_delete_2_clicked()
@@ -159,4 +159,5 @@ void StudControlWindow::on_addStudentToExam_clicked()
         }
     }
     emit(studentsAdded());
+    this->close();
 }

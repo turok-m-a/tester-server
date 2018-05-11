@@ -7,6 +7,7 @@
 #include <qcheckbox.h>
 #include <QTableWidgetItem>
 #include <QSignalMapper>
+#include <loadtest.h>
 namespace Ui {
 class QuestionControl;
 }

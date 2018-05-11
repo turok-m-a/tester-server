@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>568</width>
-    <height>389</height>
+    <width>619</width>
+    <height>408</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,17 +33,17 @@
        </property>
        <column>
         <property name="text">
-         <string>Фамилия</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
          <string>Имя</string>
         </property>
        </column>
        <column>
         <property name="text">
          <string>Отчество</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Фамилия</string>
         </property>
        </column>
        <column>

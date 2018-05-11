@@ -31,7 +31,6 @@ int Network::checkUser()
     hostEnt = gethostbyname(serverAddress.toStdString().c_str());
     if (hostEnt == NULL){
         #ifdef WIN32
-        WSACleanup();
         #endif
         int loginStatus = 3; //ошибка соединения
         return loginStatus;
@@ -44,7 +43,6 @@ int Network::checkUser()
             {
                 printf("Unable to connect\n");
                 #ifdef WIN32
-                WSACleanup();
                 #endif
                 int loginStatus = 3; //ошибка соединения
                 return loginStatus;
@@ -66,7 +64,7 @@ int Network::checkUser()
        closesocket(s);
 }
 
-QByteArray Network::sendQuery(int opCode, QByteArray query)
+QByteArray Network::sendQuery(int opCode, QByteArray query, int *ok)
 {
 
     SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -81,9 +79,9 @@ QByteArray Network::sendQuery(int opCode, QByteArray query)
             if(retVal==SOCKET_ERROR)
             {
                 printf("Unable to connect\n");
-                #ifdef WIN32
-                WSACleanup();
-                #endif
+                infowindow * infoWindow = new infowindow();
+                infoWindow->setAttribute(Qt::WA_DeleteOnClose);
+                infoWindow->setMessage("Ошибка: соединение с сервером отсутствует.\n");
                 return QByteArray();
             }
             int userType = 2;//препод/админ
@@ -120,7 +118,7 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
     SOCKADDR_IN serverInfo;
     LPHOSTENT hostEnt;
 
-    hostEnt = gethostbyname("127.0.0.1");
+    hostEnt = gethostbyname(serverAddress.toStdString().c_str());
     serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
     serverInfo.sin_family = PF_INET;
      serverInfo.sin_port = htons(10001);
@@ -130,7 +128,6 @@ QVector<Question> Network::getQuestionsForStudent(QString studLogin, int &loginS
             {
                 printf("Unable to connect\n");
                 #ifdef WIN32
-                WSACleanup();
                 #endif
                 loginStatus = 3; //ошибка соединения
                 return questionsContainer;//нет вопросов
@@ -193,7 +190,8 @@ float Network::sendQuestions(QVector<Question> questions)
     SOCKADDR_IN serverInfo;
     LPHOSTENT hostEnt;
 
-    hostEnt = gethostbyname("localhost");
+    hostEnt = gethostbyname(serverAddress.toStdString().c_str());
+    int err = WSAGetLastError();
     serverInfo.sin_addr = *((LPIN_ADDR)*hostEnt->h_addr_list);
     serverInfo.sin_family = PF_INET;
      serverInfo.sin_port = htons(10001);
@@ -203,7 +201,6 @@ float Network::sendQuestions(QVector<Question> questions)
             {
                 printf("Unable to connect\n");
                 #ifdef WIN32
-                WSACleanup();
                 #endif
                 return -1;
             }
