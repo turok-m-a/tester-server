@@ -74,6 +74,6 @@ FORMS += \
     adminwindow.ui
 win32: LIBS += -lws2_32
 QMAKE_LFLAGS += -static
-CONFIG += staticlib
+CONFIG += staticlib console
 DISTFILES += \
     classdiagram.qmodel

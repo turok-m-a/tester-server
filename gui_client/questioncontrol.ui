@@ -492,6 +492,19 @@
     <string>Сформировать тест с выбранными вопросами</string>
    </property>
   </widget>
+  <widget class="QLabel" name="time">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>110</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
   <zorder>nRandButton</zorder>
   <zorder>subjectList</zorder>
   <zorder>tableWidget</zorder>
@@ -508,6 +521,7 @@
   <zorder>groupBox_2</zorder>
   <zorder>findQuestion</zorder>
   <zorder>pushButton_3</zorder>
+  <zorder>time</zorder>
  </widget>
  <resources/>
  <connections/>
